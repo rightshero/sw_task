@@ -1,4 +1,4 @@
-![alt text](https://rightshero.com/public/assets/pp-assets/images/rh-logo.png)
+![alt text](https://rightshero.com/wp/wp-content/uploads/2024/04/RightsHero-Logo.png)
 
 
 # Software Engineer Task Assessment
