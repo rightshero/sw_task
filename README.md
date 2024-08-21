@@ -50,7 +50,7 @@ An AWS CloudFormation template YAML file for:
 # Notes
 - We would be scoring for the below aspects of the assignment:
 - DB,Architecture /Code (preferred MVC pattern), Security, Git
-- You could use a framework to create the project from scratch (Laravel or Django).
+- You could use a framework to create the project from scratch (Django).
 - You should use MySQL or Postgresql Databases.
 - Please use one table design in the database for all categories and subs.
 - The code should contain comments with important information.
