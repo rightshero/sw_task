@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Category Selection</title>
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+</head>
+<body>
+<h1>Select Categories</h1>
+<div id="categories">
+    <!-- Initial categories will be dynamically created via JavaScript -->
+</div>
+
+<div id="subcategories"></div>
+
+<input type="hidden" id="csrf_token" value="{{ csrf_token }}">
+
+<script>
+    $(document).ready(function() {
+        // Handle category creation and loading
+        function createCategory(name, parentId=null, level=1) {
+            $.post('/en/create_category/', {
+                'name': name,
+                'parent_id': parentId,
+                'csrfmiddlewaretoken': $('#csrf_token').val()
+            }, function(response) {
+                if (response.success) {
+                    // Create the category checkbox
+                    let checkbox = $('<label><input type="checkbox" class="category" data-category-id="'+response.category.id+'" data-level="'+level+'" data-category-name="'+name+'"> '+name+'</label><br>');
+                    $('#categories').append(checkbox);
+
+                    // Attach the change event
+                    checkbox.find('input').change(function() {
+                        let categoryId = $(this).data('category-id');
+                        let level = $(this).data('level');
+                        if ($(this).is(':checked')) {
+                            fetchSubcategories(categoryId, level + 1);
+                        } else {
+                            removeSubcategories(categoryId);
+                        }
+                    });
+                } else {
+                    alert(response.error);
+                }
+            });
+        }
+
+        function fetchSubcategories(categoryId, level) {
+            $.post('/en/create_subcategory/', {
+                'parent_id': categoryId,
+                'csrfmiddlewaretoken': $('#csrf_token').val()
+            }, function(response) {
+                if (response.success) {
+                    let subcategoriesDiv = $('<div>').attr('id', 'subcategories-level-' + categoryId);
+                    response.subcategories.forEach(function(subcat) {
+                        let checkbox = $('<label><input type="checkbox" class="category" data-category-id="'+subcat.id+'" data-level="'+level+'" data-category-name="'+subcat.name+'"> '+subcat.name+'</label><br>');
+                        subcategoriesDiv.append(checkbox);
+                    });
+                    $('#subcategories').append(subcategoriesDiv);
+
+                    // Attach change events to the new checkboxes
+                    subcategoriesDiv.find('.category').change(function() {
+                        let categoryId = $(this).data('category-id');
+                        let level = $(this).data('level');
+                        if ($(this).is(':checked')) {
+                            fetchSubcategories(categoryId, level + 1);
+                        } else {
+                            removeSubcategories(categoryId);
+                        }
+                    });
+                } else {
+                    alert(response.error);
+                }
+            });
+        }
+
+        function removeSubcategories(categoryId) {
+            $.post('/en/remove_subcategory/', {
+                'parent_id': categoryId,
+                'csrfmiddlewaretoken': $('#csrf_token').val()
+            }, function(response) {
+                if (response.success) {
+                    $('#subcategories-level-' + categoryId).remove();
+                } else {
+                    alert(response.error);
+                }
+            });
+        }
+
+        // Initially create the first two categories in the frontend
+        createCategory('Category A');
+        createCategory('Category B');
+    });
+</script>
+
+
+</body>
+</html>

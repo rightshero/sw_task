@@ -63,3 +63,67 @@ An AWS CloudFormation template YAML file for:
 - The **AWS CloudFormation** template YAML file.
 - Once you're finished, submit a PR to this repo with your email in a commit message.
 - The email should be the same as your email in the CV/Resume.
+
+
+## Building, Running, and Testing the Project
+
+This section provides a comprehensive guide to building, running, and testing the Django application using Docker. The project includes Docker configurations for local development, as well as instructions for running tests.
+
+### Prerequisites
+
+Before you begin, ensure you have the following installed on your local machine:
+
+- Docker
+- Docker Compose
+
+### Setting Up the Environment
+
+1. **Create a `.env` File:**
+
+   Create a `.env` file inside the `.envs` directory with the following content:
+
+   ```bash
+   DEBUG=True
+   ADMIN_URL=admin
+   DATABASE_URL='postgresql://postgres:postgres@postgres_development:5432/rightsHero'
+   REDIS_URL='redis://redis_development:6379/0'
+   CELERY_FLOWER_USER=octo
+   CELERY_FLOWER_PASSWORD=octo
+   TYPE_STORAGE=local
+   ```
+  
+2. **Build the Docker Containers:**
+   
+   Run the following command to build the Docker containers:
+
+   ```bash
+   docker-compose -f docker-compose.dev.yml up --build -d
+   ```
+   
+3. **Run the Migrations:**
+   
+   Run the following command to apply the migrations:
+
+   ```bash
+   docker-compose -f docker-compose.dev.yml exec django python manage.py migrate
+   ```
+   or go inside the container and run the command
+   ```bash
+   just migrate
+    ```
+   
+4. **Create a Superuser:**
+    
+    Run the following command to create a superuser:
+    
+     ```bash
+     docker-compose -f docker-compose.dev.yml exec django python manage.py createsuperuser
+     ```
+     or go inside the container and run the command
+     ```bash 
+      just create-admin
+     ```
+
+5. **Access the Project:**
+   
+   Access the project by visiting `http://127.0.0.1:8080/en` in your web browser.

@@ -1,0 +1,112 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: CloudFormation template to launch a t2.micro or t3.micro EC2 instance with Docker, IAM role, and security groups.
+
+Parameters:
+  InstanceType:
+    Description: EC2 instance type
+    Type: String
+    Default: t2.micro
+    AllowedValues: [t2.micro, t3.micro]
+    ConstraintDescription: Must be a valid EC2 instance type.
+
+  ECRRepoUri:
+    Description: ECR repository URI where the Docker image is stored
+    Type: String
+
+Resources:
+  EC2Instance:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: !Ref InstanceType
+      KeyName: your-key-pair-name  # Replace with your actual key pair name
+      SecurityGroups:
+        - !Ref InstanceSecurityGroup
+      IamInstanceProfile: !Ref EC2InstanceProfile
+      ImageId: ami-0c55b159cbfafe1f0  # Replace with your desired AMI ID (this is Amazon Linux 2 in us-east-1)
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/bash
+          # Update and install Docker
+          yum update -y
+          amazon-linux-extras install docker -y
+          service docker start
+          usermod -a -G docker ec2-user
+          
+          # Login to ECR
+          aws ecr get-login-password --region ${AWS::Region} | docker login --username AWS --password-stdin ${ECRRepoUri}
+          
+          # Pull the Docker image
+          docker pull ${ECRRepoUri}:latest
+
+          # Start Docker containers (assuming docker-compose.yml is present)
+          docker run -d -p 8080:8080 ${ECRRepoUri}:latest
+
+  InstanceSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Enable SSH, HTTP, and HTTPS access
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: '22'
+          ToPort: '22'
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: '80'
+          ToPort: '80'
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: '443'
+          ToPort: '443'
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: '8080'
+          ToPort: '8080'
+          CidrIp: 0.0.0.0/0
+
+  EC2InstanceRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: ec2.amazonaws.com
+            Action: sts:AssumeRole
+      Path: /
+      Policies:
+        - PolicyName: AdminAccess
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action: '*'
+                Resource: '*'
+
+  EC2InstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Path: /
+      Roles:
+        - !Ref EC2InstanceRole
+
+Outputs:
+  InstanceId:
+    Description: EC2 Instance ID
+    Value: !Ref EC2Instance
+  PublicIP:
+    Description: Public IP address of the EC2 instance
+    Value: !GetAtt EC2Instance.PublicIp
+  SSHCommand:
+    Description: Command to SSH into the instance
+    Value: !Join
+      - ''
+      - - ssh ec2-user@
+        - !GetAtt EC2Instance.PublicDnsName
+  WebsiteURL:
+    Description: URL of the deployed project
+    Value: !Join
+      - ''
+      - - 'http://'
+        - !GetAtt EC2Instance.PublicDnsName
+        - ':8080'

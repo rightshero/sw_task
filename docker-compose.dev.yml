@@ -1,0 +1,98 @@
+networks:
+  django_network:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: 172.20.0.0/16
+  # =====================================
+volumes:
+    postgresData:
+    redisData:
+  # =====================================
+services:
+  django: &django
+    build:
+      context: .
+      dockerfile: compose/django/Dockerfile
+    image: django_app
+    container_name: django_dev
+    networks:
+      django_network:
+    depends_on:
+      - redis
+      - postgres
+    volumes:
+      - .:/app:z
+    env_file:
+      - .envs/.env
+    ports:
+      - 8080:8080
+    command: just build-dev manage-start-logfile open-devlog
+  # =====================================
+  postgres:
+    image: postgres:latest
+    container_name: postgres_development
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: rightsHero
+    networks:
+      django_network:
+    volumes:
+      - postgresData:/var/lib/postgresql/data
+    ports:
+      - 5432:5432
+  # =====================================
+  redis:
+    image: redis:latest
+    container_name: redis_development
+    networks:
+      django_network:
+    volumes:
+      - redisData:/data
+    ports:
+      - 6379:6379
+  # =====================================
+  redisinsight:
+    image: redis/redisinsight:latest
+    container_name: redisinsight_development
+    networks:
+      django_network:
+    depends_on:
+      - redis
+    ports:
+      - 5540:5540
+  # =====================================
+  celeryworker:
+    <<: *django
+    image: celeryworker_development
+    container_name: celeryworker_development
+    depends_on:
+      - redis
+      - postgres
+      - django
+    ports: []
+    command: just celery-worker
+  # =====================================
+  celerybeat:
+    <<: *django
+    image: celerybeat_development
+    container_name: celerybeat_development
+    depends_on:
+      - redis
+      - postgres
+      - django
+    ports: []
+    command: just celery-beat
+  # =====================================
+  flower:
+    <<: *django
+    image: flower_development
+    container_name: flower_development
+    depends_on:
+      - redis
+      - postgres
+      - django
+    ports:
+      - 5555:5555
+    command: just celery-flower
