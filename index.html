@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dynamic Checkbox Generator</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #fcf8f7; /* Baby Blue background */
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh; /* Full viewport height */
+      }
+      .content {
+        text-align: center; /* Center text for the content block */
+        color: #5fa777;
+      }
+
+      #checkbox-container {
+        background-color: #5fa777; /* White background for the box */
+        border: 2px solid #000000; /* Border color */
+        color: #fcf8f7;
+        border-radius: 12px; /* Rounded edges */
+        padding: 20px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Shadow effect */
+        max-width: 400px;
+        width: 100%;
+        margin: 0 auto; /* Center container horizontally */
+      }
+      .checkbox-level {
+        margin-left: 20px;
+        text-align: left; /* Align text to the left inside each level */
+      }
+      .checkbox-level label {
+        display: block; /* Ensure each checkbox and label are on separate lines */
+        margin-bottom: 5px; /* Space between checkboxes */
+        line-height: 1.5; /* Improve vertical alignment */
+      }
+      .checkbox-level input[type="checkbox"] {
+        margin-right: 10px; /* Space between checkbox and label */
+        vertical-align: middle; /* Align checkbox with text */
+      }
+    </style>
+  </head>
+  <body>
+    <div class="content">
+      <h1>Dynamic Checkbox Generator</h1>
+      <p>Check a box to generate more options:</p>
+
+      <div id="checkbox-container" class="content">
+        <div id="1" class="level-1">
+          <input
+            type="checkbox"
+            id="level-1-A"
+            data-level="1"
+            data-choice="A"
+            onclick="generateCheckboxes(this)"
+          />
+          Choice A (Level 1)
+          <input
+            type="checkbox"
+            id="level-1-B"
+            data-level="1"
+            data-choice="B"
+            onclick="generateCheckboxes(this)"
+          />
+          Choice B (Level 1)<br />
+        </div>
+      </div>
+    </div>
+    <script src="public\controller.js"></script>
+  </body>
+</html>
