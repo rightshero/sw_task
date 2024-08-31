@@ -1,18 +1,49 @@
+window.addEventListener("beforeunload", function (event) {
+  fetch("/clear", {
+    method: "DELETE",
+    headers: {
+      "Content-Type": "application/json",
+    },
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      console.log("Database cleared:", data);
+    })
+    .catch((error) => {
+      console.error("Error clearing the database:", error);
+    });
+});
+
 let maxLevel = 1;
 
 function generateCheckboxes(choice) {
   const currentLevel = parseInt(choice.getAttribute("data-level"));
-  //   const id = choice.id;
-  //   console.log(id);
-
-  // If checkbox is unchecked, remove the lower level checkboxes
-  if (!choice.checked) {
-    removeLowerCheckboxes(currentLevel);
+  const currentChoice = choice.getAttribute("data-choice");
+  console.log(currentChoice);
+  var created = false;
+  var object = {
+    level: currentLevel,
+    choice: currentChoice,
+  };
+  if (choice.checked && currentLevel == maxLevel) {
+    console.log(currentChoice);
+    fetch("http://localhost:5000/", {
+      method: "POST",
+      headers: {
+        "Content-type": "application/json",
+      },
+      body: JSON.stringify(object),
+    });
+    created = true;
+  } else if (!choice.checked) {
+    removeLowerCheckboxes(currentLevel, true);
     return;
   }
 
   // Uncheck other checkboxes at the same level
-  uncheckOtherCheckboxes(currentLevel, choice.id);
+  uncheckOtherCheckboxes(currentLevel, object, choice.id, created);
+
+  // uncheckOtherCheckboxes(currentLevel, choice.id);
 
   const nextLevel = currentLevel + 1;
   const container = document.getElementById("checkbox-container");
@@ -55,7 +86,12 @@ function generateCheckboxes(choice) {
   maxLevel = nextLevel;
 }
 
-function removeLowerCheckboxes(level) {
+function removeLowerCheckboxes(level, condition) {
+  if (condition) {
+    fetch("http://localhost:5000/?level=" + level, {
+      method: "DELETE",
+    });
+  }
   const elementsToRemove = document.querySelectorAll('div[class^="level-"]');
   console.log(elementsToRemove);
   elementsToRemove.forEach((element) => {
@@ -70,7 +106,7 @@ function removeLowerCheckboxes(level) {
   }
 }
 
-function uncheckOtherCheckboxes(level, checkedId) {
+function uncheckOtherCheckboxes(level, object, checkedId, created) {
   const container = document.getElementById("checkbox-container");
   const checkboxesAtLevel = container.querySelectorAll(
     `.level-${level} input[type="checkbox"]`
@@ -80,7 +116,16 @@ function uncheckOtherCheckboxes(level, checkedId) {
     console.log(checkbox.id);
     if (checkbox.id !== checkedId) {
       checkbox.checked = false; // Uncheck other checkboxes at the same level
-      removeLowerCheckboxes(level);
+      removeLowerCheckboxes(level, false);
+      if (!created) {
+        fetch("http://localhost:5000/", {
+          method: "PUT",
+          headers: {
+            "Content-type": "application/json",
+          },
+          body: JSON.stringify(object),
+        });
+      }
     }
   });
 }

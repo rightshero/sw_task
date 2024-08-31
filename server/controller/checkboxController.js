@@ -34,13 +34,20 @@ exports.deleteCheckbox = async (req, res) => {
   }
 };
 
+exports.clearAll = async (req, res) => {
+  try {
+    await Checkbox.truncate();
+    res.status(200).json({ message: "Checkboxes removed" });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: "Failed to delete checkboxes" });
+  }
+};
+
 exports.putCheckbox = async (req, res) => {
   try {
     const { level, choice } = req.body;
-    const [updated] = await Checkbox.update(
-      { level, choice },
-      { where: { level } }
-    );
+    const [updated] = await Checkbox.update({ choice }, { where: { level } });
     if (updated) {
       const updatedCheckbox = await Checkbox.findByPk(level);
       await Checkbox.destroy({

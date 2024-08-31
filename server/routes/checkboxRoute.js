@@ -7,4 +7,6 @@ router.post("/", checkboxController.postCheckbox);
 router.delete("/", checkboxController.deleteCheckbox);
 router.put("/", checkboxController.putCheckbox);
 
+router.delete("/clear", checkboxController.clearAll);
+
 module.exports = router;
