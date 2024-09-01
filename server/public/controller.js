@@ -28,7 +28,7 @@ function generateCheckboxes(choice) {
   if (choice.checked && currentLevel == maxLevel) {
     console.log(currentChoice);
     // fetch("http://51.21.65.202:5000/", {
-    fetch("localhost:5000/", {
+    fetch("http://localhost:5000/", {
       method: "POST",
       headers: {
         "Content-type": "application/json",
@@ -90,7 +90,7 @@ function generateCheckboxes(choice) {
 function removeLowerCheckboxes(level, condition) {
   if (condition) {
     // fetch("http://51.21.65.202:5000/?level=" + level, {
-    fetch("localhost:5000/?level=" + level, {
+    fetch("http://localhost:5000/?level=" + level, {
       method: "DELETE",
     });
   }
@@ -121,7 +121,7 @@ function uncheckOtherCheckboxes(level, object, checkedId, created) {
       removeLowerCheckboxes(level, false);
       if (!created) {
         // fetch("http://51.21.65.202:5000/", {
-        fetch("localhost:5000/", {
+        fetch("http://localhost:5000/", {
           method: "PUT",
           headers: {
             "Content-type": "application/json",
