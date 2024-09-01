@@ -26,9 +26,10 @@ Resources:
           service docker start
           usermod -aG docker ec2-user
           cd /home/ec2-user
+          rm -rf sw_task
           git clone https://github.com/FarahKhalill/sw_task.git
-          cd server
-          docker-compose up -d
+          cd sw_task/server
+          docker-compose up -d --build
 
   InstanceSecurityGroup:
     Type: AWS::EC2::SecurityGroup
