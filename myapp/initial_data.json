@@ -1,0 +1,20 @@
+[
+    {
+        "model": "myapp.category",
+        "pk": 1,
+        "fields": {
+            "name": "Category A",
+            "parent": null,
+            "level": 0
+        }
+    },
+    {
+        "model": "myapp.category",
+        "pk": 2,
+        "fields": {
+            "name": "Category B",
+            "parent": null,
+            "level": 0
+        }
+    }
+]

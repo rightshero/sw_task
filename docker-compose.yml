@@ -1,0 +1,22 @@
+version: '3'
+services:
+  web:
+    image: shehab1106/rightshero 
+    ports:
+      - "80:8000" 
+    environment:
+      - DATABASE_URL=postgres://rightshero_user:0000@db:5432/rightshero  
+    depends_on:
+      - db
+
+  db:
+    image: postgres:13  
+    environment:
+      POSTGRES_USER: rightshero_user
+      POSTGRES_PASSWORD: 0000
+      POSTGRES_DB: rightshero
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:

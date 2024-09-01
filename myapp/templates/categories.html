@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Categories</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'css/styles.css' %}">
+    <script src="{% static 'js/categories.js' %}"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <h1>Select Categories</h1>
+    <form method="post">
+        {% csrf_token %}
+        <div id="categories">
+            {% for category in categories %}
+                <div class="category-container">
+                    <input type="checkbox" name="category" value="{{ category.id }}" data-level="{{ category.level }}"> {{ category.name }}
+                </div>
+            {% endfor %}
+        </div>
+        <div id="subcategories">
+        </div>
+    </form>
+</body>
+</html>
