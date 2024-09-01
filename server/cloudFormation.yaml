@@ -1,4 +1,4 @@
-AWSTemplateFormatVersion: "2024-09-01"
+AWSTemplateFormatVersion: "2010-09-09"
 Description: CloudFormation Template to launch an EC2 instance with an IAM role and deploy the Dynamic Checkbox Generator apps.
 
 Parameters:
