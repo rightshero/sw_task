@@ -11,7 +11,7 @@ This is just a breif of what I have done in the last couple of days:
 
 - You will find the HTML file and its corresponding JS file in the public folder.
 
-- I am aware that the deployment should use AWS CloudFormation, and you should save the template in a file named cloudFormation.yaml. Unfortunately, I was unsuccessful in deploying it.
+- I am aware that the deployment should use AWS CloudFormation, and you could find the template in a file named cloudFormation.yaml. Unfortunately, I was unsuccessful in deploying it.
 
 - No matter what decision is made, I would greatly appreciate your feedback. Your insights would be very helpful to me. Thank you!
 
