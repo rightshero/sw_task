@@ -1,0 +1,92 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: CloudFormation template to deploy a NestJS project on an EC2 instance with IAM role and security group settings.
+
+Parameters:
+  InstanceType:
+    Type: String
+    Default: t2.micro
+    AllowedValues:
+      - t2.micro
+      - t3.micro
+    Description: EC2 instance type for the server
+
+Resources:
+  MyEC2Instance:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: !Ref InstanceType
+      KeyName: my-key-pair  # Replace with your actual key pair name
+      SecurityGroups:
+        - !Ref InstanceSecurityGroup
+      IamInstanceProfile: !Ref InstanceProfile
+      ImageId: ami-0c55b159cbfafe1f0  # Replace with the latest Amazon Linux 2 AMI ID for your region
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/bash
+          yum update -y
+          yum install -y docker
+          service docker start
+          usermod -a -G docker ec2-user
+          curl -sL https://rpm.nodesource.com/setup_16.x | bash -
+          yum install -y nodejs
+          npm install -g pm2
+          yum install -y git
+          git clone https://github.com/ZeyadTarekk/Unlimited-Subcategories /home/ec2-user/Unlimited-Subcategories
+          cd /home/ec2-user/Unlimited-Subcategories/category-project
+          docker-compose up --build
+
+  InstanceSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Allow SSH, HTTP, and HTTPS traffic
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          CidrIp: 0.0.0.0/0
+
+  IAMRole:
+    Type: AWS::IAM::Role
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: ec2.amazonaws.com
+            Action: sts:AssumeRole
+      Path: /
+      Policies:
+        - PolicyName: AdminAccess
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action: '*'
+                Resource: '*'
+
+  InstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Roles:
+        - !Ref IAMRole
+
+Outputs:
+  InstancePublicIP:
+    Description: Public IP address of the EC2 instance
+    Value: !GetAtt 
+      - MyEC2Instance
+      - PublicIp
+  InstancePublicDNS:
+    Description: Public DNS name of the EC2 instance
+    Value: !GetAtt 
+      - MyEC2Instance
+      - PublicDnsName

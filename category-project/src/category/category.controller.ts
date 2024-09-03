@@ -18,7 +18,6 @@ import {
   ApiOkResponse,
   ApiOperation,
   ApiParam,
-  ApiQuery,
   ApiTags,
 } from '@nestjs/swagger';
 import { ViewCreatedCategoryDto } from './dtos/view-created-category.dto';
@@ -29,6 +28,10 @@ export class CategoryController {
   constructor(private readonly categoryService: CategoryService) {}
 
   @Post('initialize')
+  @ApiBadRequestResponse({ description: 'Bad Request' })
+  @ApiInternalServerErrorResponse({ description: 'Internal server error' })
+  @ApiOperation({ summary: 'Used to initialize the categories' })
+  @ApiCreatedResponse({ type: ViewCreatedCategoryDto, isArray: true })
   async initializeCategories(): Promise<Category[]> {
     const existingCategories = await this.categoryService.findMain();
     if (existingCategories.length > 0) {
