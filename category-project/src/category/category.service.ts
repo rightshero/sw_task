@@ -51,11 +51,11 @@ export class CategoryService {
       // Create 2 subcategories
       const categoryName = parent.name;
       const subcategoryA = this.categoryRepository.create({
-        name: `SUB${categoryName}-1`,
+        name: `SUB ${categoryName}-1`,
         parent,
       });
       const subcategoryB = this.categoryRepository.create({
-        name: `SUB${categoryName}-2`,
+        name: `SUB ${categoryName}-2`,
         parent,
       });
       const subA = await this.categoryRepository.save(subcategoryA);
