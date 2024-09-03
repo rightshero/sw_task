@@ -15,9 +15,11 @@
   <div id="category-container"></div>
 
   <script>
+    const BASE_URL = 'http://localhost:3000'; // Base URL for API requests
+
     $(document).ready(function() {
       // Initialize categories
-      $.post('http://localhost:3000/categories/initialize', function(data) {
+      $.post(`${BASE_URL}/categories/initialize`, function(data) {
         const container = $('#category-container');
         data.forEach(category => {
           createCategoryElement(category, container);
@@ -42,7 +44,7 @@
       }
 
       function fetchAndDisplaySubcategories(categoryId, container) {
-        $.get(`http://localhost:3000/categories/${categoryId}/subcategories`, function(data) {
+        $.get(`${BASE_URL}/categories/${categoryId}/subcategories`, function(data) {
           const subCategoryContainer = $('<div></div>').addClass('sub-category-container');
           data.forEach(subcategory => {
             createCategoryElement(subcategory, subCategoryContainer);
