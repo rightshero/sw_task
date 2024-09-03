@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dynamic Categories</title>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <style>
+    .sub-category-container {
+      margin-left: 20px;
+    }
+  </style>
+</head>
+<body>
+  <div id="category-container"></div>
+
+  <script>
+    $(document).ready(function() {
+      // Initialize categories
+      $.post('http://localhost:3000/categories/initialize', function(data) {
+        const container = $('#category-container');
+        data.forEach(category => {
+          createCategoryElement(category, container);
+        });
+      });
+
+      function createCategoryElement(category, container) {
+        const checkbox = $('<input>')
+          .attr('type', 'checkbox')
+          .attr('id', `category${category.id}`)
+          .data('id', category.id)
+          .change(handleCategoryChange);
+        const label = $('<label>').attr('for', `category${category.id}`).text(category.name);
+        const categoryDiv = $('<div></div>');
+        categoryDiv.append(checkbox).append(label);
+        container.append(categoryDiv);
+
+        // Fetch subcategories if the category is checked
+        if (checkbox.prop('checked')) {
+          fetchAndDisplaySubcategories(category.id, categoryDiv);
+        }
+      }
+
+      function fetchAndDisplaySubcategories(categoryId, container) {
+        $.get(`http://localhost:3000/categories/${categoryId}/subcategories`, function(data) {
+          const subCategoryContainer = $('<div></div>').addClass('sub-category-container');
+          data.forEach(subcategory => {
+            createCategoryElement(subcategory, subCategoryContainer);
+          });
+          container.append(subCategoryContainer);
+        });
+      }
+
+      function handleCategoryChange() {
+        const categoryId = $(this).data('id');
+        const checkbox = $(this);
+
+        if (this.checked) {
+          // Only fetch subcategories if they are not already loaded
+          if (checkbox.parent().find('.sub-category-container').length === 0) {
+            fetchAndDisplaySubcategories(categoryId, checkbox.parent());
+          }
+        } else {
+          // Remove subcategories if the checkbox is unchecked
+          checkbox.parent().find('.sub-category-container').remove();
+        }
+      }
+    });
+  </script>
+</body>
+</html>
