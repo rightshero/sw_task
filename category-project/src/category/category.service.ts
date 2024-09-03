@@ -19,7 +19,6 @@ export class CategoryService {
         })
       : null;
 
-    console.log(parentId, parent);
     if (parentId && !parent) {
       throw new NotFoundException('Parent category not found');
     }
