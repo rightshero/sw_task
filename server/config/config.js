@@ -1,9 +1,0 @@
-module.exports = {
-  development: {
-    username: "your_username",
-    password: "your_password",
-    database: "your_database",
-    host: "127.0.0.1",
-    dialect: "postgres",
-  },
-};
