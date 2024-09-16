@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Dynamic Checkbox Generator</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        background-color: #fcf8f7;
+        margin: 0;
+        padding: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        height: 100vh;
+      }
+      .content {
+        text-align: center;
+        color: #5fa777;
+      }
+
+      #checkbox-container {
+        background-color: #5fa777;
+        border: 2px solid #000000;
+        color: #fcf8f7;
+        border-radius: 12px;
+        padding: 20px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        max-width: 400px;
+        width: 100%;
+        margin: 0 auto;
+      }
+      .checkbox-level {
+        margin-left: 20px;
+        text-align: center;
+      }
+      .checkbox-level label {
+        display: inline-block;
+        margin-right: 15px;
+      }
+      .checkbox-level input[type="checkbox"] {
+        vertical-align: middle;
+      }
+      .checkbox-level-group {
+        display: flex;
+        justify-content: center;
+        margin-top: 10px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="content">
+      <h1>Dynamic Checkbox Generator</h1>
+      <p>Check a box to generate more options:</p>
+
+      <div id="checkbox-container" class="content">
+        <div id="1" class="level-1">
+          <input
+            type="checkbox"
+            id="level-1-A"
+            data-level="1"
+            data-choice="A"
+            onclick="handleCheckboxClick(this)"
+          />
+          Choice A (Level 1)
+          <input
+            type="checkbox"
+            id="level-1-B"
+            data-level="1"
+            data-choice="B"
+            onclick="handleCheckboxClick(this)"
+          />
+          Choice B (Level 1)<br />
+        </div>
+      </div>
+    </div>
+    <script
+      src = "https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    </script>
+    <script type="text/javascript">
+      // Function to get the csrf token from the cookie
+      function getCookie(name) {
+          let cookieValue = null;
+          if (document.cookie && document.cookie !== '') {
+              const cookies = document.cookie.split(';');
+              for (let i = 0; i < cookies.length; i++) {
+                  const cookie = cookies[i].trim();
+                  // Does this cookie string begin with the name we want?
+                  if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                      cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                      break;
+                  }
+              }
+          }
+          return cookieValue;
+      }
+
+      const csrftoken = getCookie('csrftoken');  // Fetch the CSRF token from the cookie
+
+      function handleCheckboxClick(checkbox) {
+        // console.log(checkbox.id)
+        const level = $(checkbox).attr('data-level');
+        const choice = $(checkbox).attr("data-choice");
+        const isChecked = checkbox.checked;
+        // print(isChecked);
+
+        // Perform AJAX request to update the backend
+        $.ajax({
+          type: "POST",
+          url: "{% url 'update_checkbox' %}", // Ensure 'update_checkbox' is mapped in urls.py
+          data: {
+            level: level,
+            choice: choice,
+            is_checked: isChecked,
+            csrfmiddlewaretoken: "{{ csrf_token }}", // CSRF token for security
+          },
+          success: function (response) {
+            console.log("Response:", response);
+          },
+          error: function (xhr, status, error) {
+            console.error("Error:", error);
+          },
+        });
+        generateCheckboxes(checkbox);
+      }
+      function generateCheckboxes(checkbox) {
+        const level = $(checkbox).attr('data-level')
+        console.log(checkbox.id)
+        // uuncheck other checkboxes at the same level
+        uncheckOtherCheckboxes(level, checkbox.id);
+
+        // If checkbox is checked->generate new checkboxes for the next level
+        if (checkbox.checked) {
+          removeNextLevels(level); // Clear all next levels before generating new ones
+
+          const nextLevel = parseInt(level) + 1;
+          // console.log(nextLevel)
+          const container = document.getElementById("checkbox-container");
+
+          const newDiv = document.createElement("div");
+          newDiv.id = nextLevel.toString();
+          newDiv.className = `checkbox-level`;
+
+          // Create a container div for the checkboxes
+          const checkboxGroupDiv = document.createElement("div");
+          checkboxGroupDiv.className = "checkbox-level-group";
+
+          // Create two new checkboxes dynamically
+          const checkbox1 = document.createElement("input");
+          checkbox1.type = "checkbox";
+          checkbox1.id = `level-${nextLevel}-A`;
+          checkbox1.dataset.level = nextLevel;
+          checkbox1.dataset.choice = "A";
+          checkbox1.onclick = function () {
+            handleCheckboxClick(checkbox1);
+          };
+
+          const label1 = document.createElement("label");
+          label1.htmlFor = checkbox1.id;
+          label1.appendChild(
+            document.createTextNode(`Choice A (Level ${nextLevel})`)
+          );
+          label1.prepend(checkbox1);
+
+          const checkbox2 = document.createElement("input");
+          checkbox2.type = "checkbox";
+          checkbox2.id = `level-${nextLevel}-B`;
+          checkbox2.dataset.level = nextLevel;
+          checkbox2.dataset.choice = "B";
+          checkbox2.onclick = function () {
+            handleCheckboxClick(checkbox2);
+          };
+
+          const label2 = document.createElement("label");
+          label2.htmlFor = checkbox2.id;
+          label2.appendChild(
+            document.createTextNode(`Choice B (Level ${nextLevel})`)
+          );
+          label2.prepend(checkbox2);
+
+          // Append the labels to the group div
+          checkboxGroupDiv.appendChild(label1);
+          checkboxGroupDiv.appendChild(label2);
+
+          // Append the group div to the new div
+          newDiv.appendChild(checkboxGroupDiv);
+
+          // Append the new div to the container
+          container.appendChild(newDiv);
+        } else {
+          // If checkbox is unchecked-> remove all subsequent levels
+          removeNextLevels(level);
+        }
+      }
+
+      // function to uncheck other checkboxes at the same level
+      function uncheckOtherCheckboxes(level, currentCheckboxId) {
+        const checkboxesAtSameLevel = document.querySelectorAll(
+          `input[data-level='${level}']`
+        );
+
+        // Uncheck all checkboxes at the same level except the current one
+        checkboxesAtSameLevel.forEach((checkbox) => {
+          if (checkbox.id !== currentCheckboxId) {
+            checkbox.checked = false;
+          }
+        });
+      }
+
+      // Function to remove all levels after the currecnt level
+      function removeNextLevels(level) {
+        let currentLevel = parseInt(level) + 1;
+
+        // Keep removing next levels as long as they exist
+        while (document.getElementById(currentLevel.toString())) {
+          const nextLevelDiv = document.getElementById(currentLevel.toString());
+          nextLevelDiv.remove();
+          currentLevel++;
+        }
+      }
+      // here wr will make sure if the user refreshes the page, all checkboxes gets deleted across the frontend and backend
+      function clearAllCheckboxes() {
+            fetch("{% url 'clear_checkboxes' %}", {
+                method: "DELETE",
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                    'X-CSRFToken': csrftoken
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Database cleared:', data);
+                // resetinf parent checkboxes to unchecked state
+                resetParentCheckboxes();
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+
+        //a  function to reset parent checkboxes to unchecked state
+        function resetParentCheckboxes() {
+            const parentCheckboxes = document.querySelectorAll("input[data-level='1']");
+            parentCheckboxes.forEach((checkbox) => {
+                checkbox.checked = false;
+            });
+        }
+
+        // ensuree checkboxes are cleared from the database and reset on page load
+        document.addEventListener("DOMContentLoaded", function() {
+            clearAllCheckboxes();
+        })
+    </script>
+  </body>
+</html>
