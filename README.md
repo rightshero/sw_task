@@ -1,65 +1,84 @@
-![alt text](https://rightshero.com/wp/wp-content/uploads/2024/04/RightsHero-Logo.png)
+# Dynamic Categories Project
 
+This project is a Django web application that allows users to dynamically select categories and subcategories using AJAX. The project is Dockerized for easy setup and also includes an AWS CloudFormation template for deploying the app on AWS.
 
-# Software Engineer Task Assessment
+## Project Structure
 
-This role will be part of the Rightshero software development team.
+- **Backend**: Django
+- **Frontend**: HTML + AJAX
+- **Database**: MySQL (via Docker)
+- **Containerization**: Docker Compose
+- **Deployment**: AWS CloudFormation
 
-As a software engineer you are a part of a small but very efficient and multi-tasking team. 
+---
 
-The team is tasked with handling all the software aspects of our service.
+## Prerequisites
 
-# The task
-The task will be a **project** and **AWS CloudFormation** template:
+Ensure you have the following installed on your machine:
 
-## [1] The project:
-A project contains one page have a 2 categories checkboxes
+- [Docker]
+- [Docker Compose]
+- AWS CLI configured with administrative access if deploying on AWS.
 
-- [ ] Category A
-- [ ] Category B
+---
 
-Unlimited subcategories of parent category (if it is hard to achieve the unlimited levels, you can set 3 levels hard-coded)
-Should use Ajax.
+## Running Locally with Docker Compose
 
-### Example
-- [ ] Category A
-- [ ] Category B
+Follow these steps to set up and run the project locally using Docker Compose:
 
-If user select “Category B”
-The system will create another 2 checkboxes with
+1. **Clone the repository:**
 
-- [ ] SUB Category B1
-- [ ] SUB Category B2
+    ```bash
+    git clone <your-repo-url>
+    cd <your-repo-directory>
+    ```
 
-Selecting Sub Category B2 will create another 2 checkboxes
+2. **Set up environment variables:**
 
-- [ ] SUB SUB Category B2-1
-- [ ] SUB SUB Category B2-2
- And so on
+    Create a `.env` file in the project root directory and set your environment variables:
 
+    ```
+    DATABASE_URL=mysql://root:rootpassword@db:3306/mydatabase
+    MYSQL_DATABASE=mydatabase
+    MYSQL_PASSWORD=rootpassword
+    MYSQL_ROOT_PASSWORD=rootpassword
+    ```
 
-## [2] AWS CloudFormation
-An AWS CloudFormation template YAML file for:
-- Launch a t2.micro or t3.micro EC2 instance
-- Create IAM role with admin privileges
-- Attach the IAM role to the EC2 instance created earlier
-- Deploy the project on the EC2 instance
-- The instance should be accessable via SSH, HTTP and HTTPS protocols/ports
+3. **Build and run the containers:**
 
+    Use Docker Compose to build and start the application and database containers:
 
-# Notes
-- We would be scoring for the below aspects of the assignment:
-- DB,Architecture /Code (preferred MVC pattern), Security, Git
-- You could use a framework to create the project from scratch (Django).
-- You should use MySQL or Postgresql Databases.
-- Please use one table design in the database for all categories and subs.
-- The code should contain comments with important information.
-- README file for run the project locally.
-- The **AWS CloudFormation** template file.
+    ```bash
+    docker-compose up --build
+    ```
 
+4. **Access the application:**
 
-# Deliverables
-- The project should be ready with docker compose (web service + DB).
-- The **AWS CloudFormation** template YAML file.
-- Once you're finished, submit a PR to this repo with your email in a commit message.
-- The email should be the same as your email in the CV/Resume.
+    Once the containers are running, you can access the web application at:
+
+    ```
+    http://localhost:8000/
+    http://localhost:8000/categories/
+    ```
+
+5. **Running Django commands:**
+
+    To run Django management commands (such as migrations), use the following command:
+
+    ```bash
+    docker-compose exec web python manage.py migrate
+    ```
+
+---
+
+## Database Setup
+
+The project uses a MySQL database. The database will be created automatically when you run the project with Docker Compose. If you need to interact with the database container (e.g., to check the tables), use:
+
+```bash
+docker-compose exec db mysql -u root -p
+```
+
+## Sub Categories Creation
+
+Creating Unlimited subcategories of parent category while checking the parent category.

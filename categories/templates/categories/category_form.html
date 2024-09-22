@@ -1,0 +1,51 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dynamic Categories</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <h1>Select Categories</h1>
+    <form id="category-form">
+        <div id="category-level-1">
+            {% for category in categories %}
+                <input type="checkbox" class="category-checkbox" value="{{ category.id }}" data-level="1"> {{ category.name }}<br>
+            {% endfor %}
+        </div>
+    </form>
+    <script type="text/javascript">
+        $(document).ready(function() {
+            $('#category-form').on('change', '.category-checkbox', function() {
+                if ($(this).is(':checked')) {
+                    var parentId = $(this).val();
+                    var level = $(this).data('level') + 1;
+
+                    // Clear subcategories at the current level and beyond
+                    $('#category-level-' + level).nextAll().remove();
+
+                    // Load subcategories via AJAX
+                    $.ajax({
+                        url: "{% url 'load_subcategories' %}",
+                        type: 'POST',
+                        data: {
+                            'parentId': parentId,
+                            'csrfmiddlewaretoken': '{{ csrf_token }}'
+                        },
+                        success: function(data) {
+                            if (data.length > 0) {
+                                var html = '<div id="category-level-' + level + '">';
+                                $.each(data, function(index, item) {
+                                    html += '<input type="checkbox" class="category-checkbox" value="' + item.id + '" data-level="' + level + '"> ' + item.name + '<br>';
+                                });
+                                html += '</div>'
+                                $('#category-form').append(html);
+                            }
+                        }
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>
