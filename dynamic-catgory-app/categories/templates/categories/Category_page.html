@@ -5,6 +5,7 @@
 </head>
 <body>
     <h1>Select Categories</h1>
+    {% csrf_token %}
     <ul id="category-list">
         {% for category in categories %}
             <li>
@@ -13,5 +14,59 @@
             </li>
         {% endfor %}
     </ul>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function(){
+            $('#category-list').on('change', '.category-checkbox', function(){
+                var checkbox = $(this);
+                var categoryId = checkbox.data('id');
+
+                if (checkbox.is(':checked')) {
+                    $.ajax({
+                        url: "{% url 'load_subcategories' %}",
+                        data: {
+                            'parent_id': categoryId
+                        },
+                        success: function(data){
+                            if (data.length > 0) {
+                                var sublist = $('<ul></ul>');
+                                $.each(data, function(index, item){
+                                    var listItem = $('<li></li>');
+                                    var input = $('<input type="checkbox" class="category-checkbox">')
+                                        .attr('data-id', item.id);
+                                    listItem.append(input).append(' ' + item.name);
+                                    sublist.append(listItem);
+                                });
+                                checkbox.parent().append(sublist);
+                            } else {
+                                $.ajax({
+                                    url: "{% url 'auto_create_subcategories' %}",
+                                    method: 'POST',
+                                    data: {
+                                        'parent_id': categoryId,
+                                        'csrfmiddlewaretoken': '{{ csrf_token }}'
+                                    },
+                                    success: function(newData){
+                                        var sublist = $('<ul></ul>');
+                                        $.each(newData, function(index, item){
+                                            var listItem = $('<li></li>');
+                                            var input = $('<input type="checkbox" class="category-checkbox">')
+                                                .attr('data-id', item.id);
+                                            listItem.append(input).append(' ' + item.name);
+                                            sublist.append(listItem);
+                                        });
+                                        checkbox.parent().append(sublist);
+                                    }
+                                });
+                            }
+                        }
+                    });
+                } else {
+                    checkbox.parent().find('ul').remove();
+                }
+            });
+        });
+    </script>
 </body>
 </html>
