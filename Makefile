@@ -23,7 +23,7 @@ exec:
 	docker-compose -f $(COMPOSE_FILE) exec $(filter-out $@,$(MAKECMDGOALS))
 	
 makemigrations:
-	docker-compose -f $(COMPOSE_FILE) run --rm django python manage.py makemigrations
+	docker-compose -f $(COMPOSE_FILE) run --rm django python manage.py makemigrations $(filter-out $@,$(MAKECMDGOALS))
 
 migrate:
 	docker-compose -f $(COMPOSE_FILE) run --rm django python manage.py migrate $(filter-out $@,$(MAKECMDGOALS))

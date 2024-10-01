@@ -28,7 +28,7 @@ class CategoriesService:
 
     def get_categories(self) -> list[Category]:
         model = self.get_model()
-        return list(model.objects.all())
+        return list(model.objects.filter(parent=None))
 
     def create_subcategories(self, parent_id: uuid.uuid4, validated_data: list[dict]) -> list[Category]:
         parent = self.get_category(parent_id)
@@ -42,6 +42,8 @@ class CategoriesService:
             subcategories.append(subcategory)
         return subcategories
 
-    def get_subcategories(self, parent_id: uuid.uuid4) -> list[Category]:
+    def get_subcategories(self, parent_id: uuid.uuid4, values: tuple[str] | None = None) -> list[Category]:
         parent = self.get_category(parent_id)
+        if values:
+            return list(parent.subcategories.values(*values))
         return list(parent.subcategories.all())

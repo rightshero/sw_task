@@ -1,40 +1,16 @@
 from django.test import TestCase
 from sw_task.categories.services import CategoriesService
 from sw_task.categories import exceptions
+from .common import CommonUtils
 
 
-class TestCategories(TestCase):
-    def setUp(self):
-        self.categories_service = CategoriesService()
-
-    def create_categories(self, count=3):
-        data = [
-            {"name": f"Category {i}"}
-            for i in range(1, count + 1)
-        ]
-        created_categories = self.categories_service.create_categories(
-            data
-        )
-        return created_categories, data
-    
-    def create_subcategories(self, parent_id, count=3):
-        data = [
-            {"name": f"Subcategory {i}"} for i in range(1, count + 1)
-        ]
-        created_subcategories = self.categories_service.create_subcategories(
-            parent_id, data
-        )
-        return created_subcategories, data
+class TestCategories(TestCase, CommonUtils):
 
     def test_create_categories(self):
         count = 3
         created_categories, data_input = self.create_categories(count=count)
         for i, category in enumerate(created_categories):
             self.assertEqual(category.name, data_input[i]["name"])
-        # self.assertEqual(len(created_categories), count)
-        # self.assertEqual(created_categories[0].name, data_input[0]["name"])
-        # self.assertEqual(created_categories[1].name, data_input[1]["name"])
-        # self.assertEqual(created_categories[2].name, data_input[2]["name"])
     
     def test_create_categories_with_existing_categories(self):
         count = 3
@@ -116,3 +92,21 @@ class TestCategories(TestCase):
     def test_get_subcategories_parent_not_found(self):
         with self.assertRaises(exceptions.CategoryNotFoundError):
             self.categories_service.get_subcategories(0)
+    
+    def test_get_subcategories_with_specific_fields_only(self):
+        count = 1
+        created_categories, _ = self.create_categories(count=count)
+        parent_category = created_categories[0]
+        self.assertEqual(len(parent_category.subcategories.all()), 0)
+        count = 3
+        created_subcategories, _ = self.create_subcategories(
+            parent_category.id, count=count
+        )
+        self.assertEqual(len(parent_category.subcategories.all()), count)
+        subcategories = self.categories_service.get_subcategories(
+            parent_category.id, values=("name",)
+        )
+        self.assertEqual(len(subcategories), count)
+        for i, subcategory in enumerate(subcategories):
+            self.assertEqual(subcategory["name"], f"Subcategory {i + 1}")
+            self.assertNotIn("parent", subcategory)
