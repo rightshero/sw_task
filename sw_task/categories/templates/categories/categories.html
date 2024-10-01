@@ -1,0 +1,32 @@
+<!-- templates/your_app/category_tree.html -->
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Category Tree View with Checkboxes</title>
+    
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'categories/css/styles.css' %}">
+</head>
+<body>
+    <h1>Category Tree View with Checkboxes</h1>
+
+    <!-- CSRF Token for POST requests -->
+    <input type="hidden" id="csrf_token" value="{{ csrf_token }}">
+
+    <!-- Categories list -->
+    <ul id="categories">
+        {% for category in categories %}
+            <li>
+                <input type="checkbox" class="category-checkbox" data-id="{{ category.id }}">
+                <label>{{ category.name }}</label>
+                <ul class="subcategories"></ul>  <!-- Subcategories will be loaded here -->
+            </li>
+        {% endfor %}
+    </ul>
+
+    <script src="{% static 'categories/js/script.js' %}"></script>
+</body>
+</html>
