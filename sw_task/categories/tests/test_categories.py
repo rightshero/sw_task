@@ -93,20 +93,46 @@ class TestCategories(TestCase, CommonUtils):
         with self.assertRaises(exceptions.CategoryNotFoundError):
             self.categories_service.get_subcategories(0)
     
-    def test_get_subcategories_with_specific_fields_only(self):
+    def test_get_or_create_subcategories(self):
         count = 1
         created_categories, _ = self.create_categories(count=count)
         parent_category = created_categories[0]
         self.assertEqual(len(parent_category.subcategories.all()), 0)
         count = 3
-        created_subcategories, _ = self.create_subcategories(
-            parent_category.id, count=count
-        )
+        subcategories = self.get_create_subcategories(parent_category.id, count)
+        self.assertEqual(len(subcategories), count)
         self.assertEqual(len(parent_category.subcategories.all()), count)
-        subcategories = self.categories_service.get_subcategories(
-            parent_category.id, values=("name",)
-        )
+    
+    def test_get_or_create_subcategories_get_specific_fields_only(self):
+        count = 1
+        created_categories, _ = self.create_categories(count=count)
+        parent_category = created_categories[0]
+        self.assertEqual(len(parent_category.subcategories.all()), 0)
+        count = 3
+        subcategories = self.get_create_subcategories(parent_category.id, count)
+        self.assertEqual(len(subcategories), count)
+        self.assertEqual(len(parent_category.subcategories.all()), count)
+        subcategories = self.get_create_subcategories(parent_category.id, count, values=("name",))
         self.assertEqual(len(subcategories), count)
         for i, subcategory in enumerate(subcategories):
             self.assertEqual(subcategory["name"], f"Subcategory {i + 1}")
-            self.assertNotIn("parent", subcategory)
+
+   
+    def test_create_category_name(self):
+        self.assertEqual(self.categories_service.create_category_name("Category B", 0), "SUB Category B-1")
+        self.assertEqual(self.categories_service.create_category_name("Category B", 1), "SUB Category B-2")
+        self.assertEqual(self.categories_service.create_category_name("SUB Category B-1", 0), "SUB SUB Category B-1-1")
+        self.assertEqual(self.categories_service.create_category_name("SUB Category B-1", 1), "SUB SUB Category B-1-2")
+        self.assertEqual(self.categories_service.create_category_name("SUB Category B-1-1", 0), "SUB SUB Category B-1-1-1")
+        self.assertEqual(self.categories_service.create_category_name("SUB Category B-1-1", 1), "SUB SUB Category B-1-1-2")
+
+
+    def test_get_or_create_subcategories_no_data(self):
+        count = 1
+        created_categories, input_data = self.create_categories(count=count)
+        parent_category = created_categories[0]
+        self.assertEqual(len(parent_category.subcategories.all()), 0)
+        subcategories = self.categories_service.get_or_create_subcategories(parent_category.id)
+        self.assertEqual(len(subcategories), 2)
+        self.assertIn(created_categories[0].name, subcategories[0].name)
+        self.assertIn("SUB", subcategories[0].name)

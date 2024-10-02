@@ -30,12 +30,20 @@ class TestCategoryAPIView(TestCase):
             parent_id, data
         )
         return created_subcategories, data
-   
+    
     def test_subcategories_list(self):
-        response = self.client.get(reverse('subcategories-list', kwargs={'category_id': self.categories[0].id}))
+        response = self.client.get(reverse('subcategories-list-create', kwargs={'category_id': self.categories[0].id}))
         self.assertEqual(response.status_code, 200)
         self.assertEqual(len(response.json()), self.num)
 
     def test_subcategories_list_method_not_allowed(self):
-        response = self.client.post(reverse('subcategories-list', kwargs={'category_id': self.categories[0].id}))
+        response = self.client.post(reverse('subcategories-list-create', kwargs={'category_id': self.categories[0].id}))
         self.assertEqual(response.status_code, 405)
+    
+    def test_get_or_create_subcategories(self):
+        response = self.client.get(reverse('subcategories-list-create', kwargs={'category_id': self.categories[0].id}))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.json()), self.num)
+        response = self.client.get(reverse('subcategories-list-create', kwargs={'category_id': self.categories[0].id}))
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(len(response.json()), self.num)

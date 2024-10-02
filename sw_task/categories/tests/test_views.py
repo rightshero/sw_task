@@ -12,6 +12,6 @@ class TestCategoriesViews(TestCase, CommonUtils):
     def test_home(self):
         response = self.client.get(reverse("categories-home"))
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, "pages/home.html")
+        self.assertTemplateUsed(response, "categories/categories.html")
         self.assertEqual(len(response.context["categories"]), self.num)
 

@@ -20,3 +20,10 @@ class CommonUtils:
             parent_id, data
         )
         return created_subcategories, data
+
+    def get_create_subcategories(self, parent_id, count=3, values=None):
+        data = [
+            {"name": f"Subcategory {i}"} for i in range(1, count + 1)
+        ]
+        subcategories = self.categories_service.get_or_create_subcategories(parent_id, validated_data=data, values=values)
+        return subcategories

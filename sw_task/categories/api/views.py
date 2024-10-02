@@ -9,7 +9,7 @@ CATEGORIES_SERVICE = CategoriesService()
 @require_http_methods(['GET'])
 def subcategories_api_view(request, category_id):
     try:
-        subcategories = CATEGORIES_SERVICE.get_subcategories(category_id, values=('id', 'name'))
+        subcategories = CATEGORIES_SERVICE.get_or_create_subcategories(category_id, values=('id', 'name'))
     except CategoryNotFoundError:
         return JsonResponse(status=404, data={'error': 'Category does not exist'})
     return JsonResponse(data=subcategories, safe=False)
