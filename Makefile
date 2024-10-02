@@ -1,4 +1,4 @@
-COMPOSE_FILE = docker-compose.local.yml
+COMPOSE_FILE = docker-compose.production.yml
 
 
 upbuild:
