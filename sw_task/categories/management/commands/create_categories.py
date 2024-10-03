@@ -8,12 +8,10 @@ class Command(BaseCommand):
     help = 'Create categories'
 
     def add_arguments(self, parser):
-        parser.add_argument('--count', type=int, nargs='?', help='Number of categories to create')
+        parser.add_argument('count', type=int, help='Number of categories to create')
     
     def handle(self, *args, **kwargs):
-        count = kwargs.get('--count')
-        if not count:
-            count = 0
+        count = kwargs['count']
         data = [
             {"name": f"Category {i}"}
             for i in range(1, count + 1)
