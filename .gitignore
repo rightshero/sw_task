@@ -279,6 +279,5 @@ sw_task/media/
 .ipython/
 .env
 .envs/*
-.envs/.local
-!.envs/.local/
-# .envs
+.envs/.local/*
+.envs
