@@ -1,0 +1,96 @@
+Resources:
+  AppNode:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: t2.micro
+      ImageId: ami-04dd23e62ed049936
+      KeyName: sw-task-key # add your key name here for ssh
+      SecurityGroups:
+        - !Ref AppNodeSG
+      UserData:
+        Fn::Base64: !Sub |
+          #!/bin/bash
+          #
+          sudo apt-get update && sudo apt-get install --no-install-recommends -y build-essential libpq-dev ca-certificates curl
+          # Install Docker and run it as a non-root user
+          sudo install -m 0755 -d /etc/apt/keyrings
+          sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+          sudo chmod a+r /etc/apt/keyrings/docker.asc
+          echo \
+            "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu \
+            $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
+            sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+          sudo apt-get install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
+          sudo usermod -aG docker $USER
+          newgrp docker
+          sudo systemctl enable docker.service
+          sudo systemctl enable containerd.service
+          # sometimes it will not come to this line so we need to run it manually
+          # or we can add it to the user data
+          git clone https://github.com/fayedemad/sw_task.git
+          here
+          cd sw_task
+          cat <<EOL > .env
+          # General
+          # ------------------------------------------------------------------------------
+          DJANGO_DEBUG=False
+          DJANGO_SETTINGS_MODULE=config.settings.production
+          DJANGO_SECRET_KEY=kiGQZwNRelhBY5iAXEmDITDRCxbUkBXePvXQ8B9y6dRLeH0zCOZXnrq1Hsc8kmdM
+          DJANGO_ADMIN_URL=UNPBMBvu8Qi6SRt45shsKUucrBTmmiKB/
+          DJANGO_ALLOWED_HOSTS=localhost, # add domains here
+          DJANGO_CSRF_TRUSTED_ORIGINS=http://localhost:80, # add allowed_domains here
+
+          # Security
+          # ------------------------------------------------------------------------------
+          DJANGO_SECURE_SSL_REDIRECT=False
+
+          # Gunicorn
+          # ------------------------------------------------------------------------------
+          WEB_CONCURRENCY=4
+          # Redis
+          # ------------------------------------------------------------------------------
+          REDIS_URL=redis://redis:6379/0
+
+          # PostgreSQL
+          # ------------------------------------------------------------------------------
+          POSTGRES_HOST=postgres_host
+          POSTGRES_PORT=postgres_port
+          POSTGRES_DB=your_db_name
+          POSTGRES_USER=your_postgres_user
+          POSTGRES_PASSWORD=your_postgres_password
+          EOL
+          # can edit the following lines to use
+          # docker compose instead
+          sudo apt-get install -y make
+          make upbuild-bg
+          make migrate
+          make command create_categories 2
+
+          # one last thing for ssl to function properly
+          # you need to add the ssl in sw_task/compose/production/nginx/ssl
+          # and add the domains for server_name directive in
+          # and add ssl cert and key in the following files
+          # sw_task/compose/production/nginx/default.conf
+
+
+  AppNodeSG:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: Enable SSH, HTTP, HTTPS
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: '22'
+          ToPort: '22'
+          CidrIp: 0.0.0.0/0 
+        - IpProtocol: tcp
+          FromPort: '80'
+          ToPort: '80'
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: '8080'
+          ToPort: '8080'
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: '443'
+          ToPort: '443'
+          CidrIp: 0.0.0.0/0
