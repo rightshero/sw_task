@@ -72,6 +72,8 @@ COPY --chown=django:django . ${APP_HOME}
 
 # make django owner of the WORKDIR directory as well.
 RUN chown -R django:django ${APP_HOME}
+# create a directory for static files and make django the owner of the directory
+RUN mkdir ${APP_HOME}/staticfiles && chown -R django:django ${APP_HOME}/staticfiles
 
 USER django
 
