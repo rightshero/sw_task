@@ -115,7 +115,5 @@ LOGGING = {
     },
 }
 
-
-# Your stuff...
-# ------------------------------------------------------------------------------
-DEBUG = True
+DEBUG = env.bool("DJANGO_DEBUG", False)
+CSRF_TRUSTED_ORIGINS = env.list("DJANGO_CSRF_TRUSTED_ORIGINS", default=["http://localhost:8080"])
