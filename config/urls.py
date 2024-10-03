@@ -14,6 +14,8 @@ urlpatterns = [
         TemplateView.as_view(template_name="pages/about.html"),
         name="about",
     ),
+    path("", include("sw_task.categories.urls")),
+    path("", include("sw_task.categories.api.urls")),
     # Django Admin, use {% url 'admin:index' %}
     path(settings.ADMIN_URL, admin.site.urls),
     # Media files

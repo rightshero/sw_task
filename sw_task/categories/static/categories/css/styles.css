@@ -1,0 +1,40 @@
+/* static/your_app/css/styles.css */
+
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 20px;
+    background-color: #f4f4f4;
+}
+
+h1 {
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+ul {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid black;
+    border-radius: 5px;
+    align-items: flex-start;
+    list-style-type: none;
+    padding-left: 20px;
+}
+
+li {
+    margin: 5px 0;
+}
+
+li .category-checkbox {
+    margin-right: 10px;
+}
+
+ul.subcategories {
+    display: none;  /* Subcategories hidden by default */
+    padding-left: 20px;
+}
+
+ul.subcategories.open {
+    display: block;  /* Show subcategories when clicked */
+}

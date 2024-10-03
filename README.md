@@ -1,65 +1,62 @@
-![alt text](https://rightshero.com/wp/wp-content/uploads/2024/04/RightsHero-Logo.png)
+# A Simple Software Task Written in django using Ajax for API calls
+
+## local Installation
+
+1. Clone the repository
+2. Ensure you have docker and docker-compose installed if not install it from [here](https://docs.docker.com/get-docker/)
+3. cd into the project directory.
+4. Create a .env file in the root directory and add the following environment variables
+```bash
+    DEBUG=True
+    SECRET_KEY=your_secret_key
+    DJANGO_ALLOWED_HOSTS=localhost
+    USE_DOCKER=yes
+    IPYTHONDIR=/app/.ipython
+    POSTGRES_DB=your_db_name
+    POSTGRES_USER=your_db_user
+    POSTGRES_PASSWORD=your_db_password
+    POSTGRES_HOST=postgres   # this is the name of the postgres service in the docker-compose file
+    POSTGRES_PORT=5432 # this is the default port for postgres you can change it if you want
+```
+### for make 
+In the Makefile you need to change the COMPOSE_FILE var to __`docker-compose.local.yml`__
+
+5. run 
+### If you have make installed
+
+```bash
+    $ make upbuild
+    $ make migrate
+```
+
+### If you dont have make installed
+```bash
+    $ docker compose -f docker-compose.local.yml up --build
+    $ docker compose -f docker-compose.local.yml run --rm django python manage.py migrate
+```
+6. Open your browser and navigate to [http://localhost:8000](http://localhost:8000)
+7. Creating a superuser is necessary to access the admin panel. To create a superuser run
+### For make
+```bash
+    $ make createsuperuser
+```
+### If you dont have make installed
+
+```bash
+    $ docker compose -f docker-compose.local.yml run --rm django python manage.py createsuperuser
+```
+8. To access the admin panel navigate to [http://localhost:8000/admin](http://localhost:8000/admin)
+9. To create a categories using django commands run
+### For make
+```bash
+    $ make command create_categories
+```
+### If you dont have make installed
+```bash
+    $ docker compose -f docker-compose.local.yml run --rm django python manage.py create_categories 
+```
 
 
-# Software Engineer Task Assessment
-
-This role will be part of the Rightshero software development team.
-
-As a software engineer you are a part of a small but very efficient and multi-tasking team. 
-
-The team is tasked with handling all the software aspects of our service.
-
-# The task
-The task will be a **project** and **AWS CloudFormation** template:
-
-## [1] The project:
-A project contains one page have a 2 categories checkboxes
-
-- [ ] Category A
-- [ ] Category B
-
-Unlimited subcategories of parent category (if it is hard to achieve the unlimited levels, you can set 3 levels hard-coded)
-Should use Ajax.
-
-### Example
-- [ ] Category A
-- [ ] Category B
-
-If user select “Category B”
-The system will create another 2 checkboxes with
-
-- [ ] SUB Category B1
-- [ ] SUB Category B2
-
-Selecting Sub Category B2 will create another 2 checkboxes
-
-- [ ] SUB SUB Category B2-1
-- [ ] SUB SUB Category B2-2
- And so on
+## production Installation
 
 
-## [2] AWS CloudFormation
-An AWS CloudFormation template YAML file for:
-- Launch a t2.micro or t3.micro EC2 instance
-- Create IAM role with admin privileges
-- Attach the IAM role to the EC2 instance created earlier
-- Deploy the project on the EC2 instance
-- The instance should be accessable via SSH, HTTP and HTTPS protocols/ports
-
-
-# Notes
-- We would be scoring for the below aspects of the assignment:
-- DB,Architecture /Code (preferred MVC pattern), Security, Git
-- You could use a framework to create the project from scratch (Django).
-- You should use MySQL or Postgresql Databases.
-- Please use one table design in the database for all categories and subs.
-- The code should contain comments with important information.
-- README file for run the project locally.
-- The **AWS CloudFormation** template file.
-
-
-# Deliverables
-- The project should be ready with docker compose (web service + DB).
-- The **AWS CloudFormation** template YAML file.
-- Once you're finished, submit a PR to this repo with your email in a commit message.
-- The email should be the same as your email in the CV/Resume.
