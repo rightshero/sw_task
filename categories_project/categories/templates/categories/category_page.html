@@ -1,0 +1,49 @@
+<form id="category-form">
+    {% for category in categories %}
+        <label>
+            <input type="checkbox" class="category-checkbox" data-id="{{ category.id }}">{{ category.name }}
+        </label><br>
+    {% endfor %}
+</form>
+
+<!-- Dynamic container to append subcategories -->
+<div id="subcategory-container"></div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+<script type="text/javascript">
+    $(document).on('change', '.category-checkbox', function() {
+        var categoryId = $(this).data('id');
+        var $checkbox = $(this);
+        
+        if (this.checked) {
+            $.ajax({
+                url: "{% url 'load_subcategories' %}",  // Correct URL for AJAX request
+                type: "POST",
+                data: {
+                    'parent_id': categoryId,
+                    'csrfmiddlewaretoken': '{{ csrf_token }}'
+                },
+                success: function(subcategories) {
+                    if (subcategories.length > 0) {
+                        // Container for new subcategories
+                        var subcategoryHtml = '<div class="subcategory-container" id="subcategories-' + categoryId + '">';
+                        
+                        $.each(subcategories, function(index, subcategory) {
+                            subcategoryHtml += '<label><input type="checkbox" class="category-checkbox" data-id="'+subcategory.id+'">' + subcategory.name + '</label><br>';
+                        });
+                        subcategoryHtml += '</div>';
+
+                        // Append the new subcategories below the selected category
+                        $checkbox.closest('label').after(subcategoryHtml);
+                    }
+                },
+                error: function(xhr, status, error) {
+                    console.log("Error: " + error);
+                }
+            });
+        } else {
+            // Remove subcategories if parent category is unchecked
+            $('#subcategories-' + categoryId).remove();
+        }
+    });
+</script>
