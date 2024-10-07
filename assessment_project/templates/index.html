@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="csrf-token" content="{{ csrf_token }}">
+    <title>Task Assessment</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <div id="checkboxContainer">
+        {% if categories %}
+            {% for category in categories %}
+                <div class="innerdiv" data-id="div{{ category.id }}">
+                    <p>
+                        <label>
+                            <input type=checkbox class="chkbox" data-id="{{ category.id }}">{{ category.name }} 
+                        </label>
+                    </p>
+                </div>
+            {% endfor %}
+        {% endif %}
+    </div>
+    
+    <script>
+        $(document).ready(function() {
+     
+            $('#checkboxContainer').on('change', '.chkbox', function() {
+                var parent_id = $(this).attr("data-id")
+
+                if ($(this).is(':checked')) {
+                    var divId = $(this).closest('div').data('id');
+                    $.ajax({
+                        url: '/assessment_app/get_child/', 
+                        type: 'GET',
+                        data: {
+                            parent: parent_id,
+                            csrfmiddlewaretoken: '{{ csrf_token }}'
+                        },
+                        success: function(response) {
+                            $.each(response, function(index, value){
+                                
+                                $('div[data-id="'+divId+'"]').append(
+                                    '<p><label><input type="checkbox" class="chkbox" data-id=' 
+                                    + value.id + '>'+value.name+'</label></p>'
+                                );
+                              
+                            })
+                        },
+                        error: function(xhr, status, error) {
+                            console.error('Error:', error);
+                        }
+                    });
+
+                } else {
+                    var parent_id = $(this).attr("data-id");
+                    $.ajax({
+                        url: '/assessment_app/get_all_children/', 
+                        type: 'GET',
+                        data: {
+                            parent: parent_id,
+                            csrfmiddlewaretoken: '{{ csrf_token }}'
+                        },
+                        success: function(response) {
+                            $.each(response, function(index, value){
+                            $('input[data-id="'+value.id+'"]').parent().remove();
+                            $('input[data-id="'+value.id+'"]').remove();
+                            })
+                        },
+                        error: function(xhr, status, error) {
+                            console.error('Error:', error);
+                        }
+                    }); 
+                 
+                }
+            });
+        });
+        
+    </script>
+
+</body>
+</html>

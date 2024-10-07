@@ -1,0 +1,36 @@
+version: '3.3'
+
+services:
+  web:
+    build: .
+    command: ./wait-for-it.sh db -- python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - .:/app
+    ports:
+      - "8000:8000"
+    environment:
+      - DATABASE_URL=mysql://swati:swati@db:3306/MyDB
+    depends_on:
+      - db
+    networks:
+      - mynetwork
+
+  db:
+    image: mysql:5.7
+    environment:
+      MYSQL_DATABASE: MyDB
+      MYSQL_USER: swati
+      MYSQL_PASSWORD: swati
+      MYSQL_ROOT_PASSWORD: root
+    volumes:
+      - db_data:/var/lib/mysql
+    networks:
+      - mynetwork
+
+networks:
+  mynetwork:
+
+volumes:
+  db_data:
+  
+
