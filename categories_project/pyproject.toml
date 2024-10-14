@@ -10,6 +10,8 @@ python = "^3.12"
 django = "^5.1.2"
 djangorestframework = "^3.15.2"
 psycopg2-binary = "^2.9.9"    # for postgres db connection - needed to avoid building wheels for psycopg2 from source
+pydantic = "^2.9.2"
+pydantic-settings = "^2.5.2"
 
 
 [build-system]

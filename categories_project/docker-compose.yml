@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  production_db:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    ports:
+      - "5433:5432"
+    env_file:
+      - database.env
+    volumes:
+      - database:/var/lib/postgresql/data
+    networks:
+      database_network:
+        aliases:
+          - db  
+
+  database_management:
+    image: dpage/pgadmin4
+    restart: unless-stopped
+    ports:
+      - "8888:80"
+    env_file:
+      - database_management.env
+    volumes:
+      - pgadmin:/var/lib/pgadmin/cache
+    networks:
+      database_network:
+        aliases:
+          - pgadmin  
+
+volumes:
+  database:
+  pgadmin:
+
+networks:
+  database_network:
+    driver: bridge  
