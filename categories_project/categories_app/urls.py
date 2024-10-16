@@ -4,4 +4,5 @@ from categories_app import views
 
 urlpatterns: list[URLPattern] = [
     path('', views.index, name='index'),
+    path('category/', views.create_category, name='create_category'),
 ]
