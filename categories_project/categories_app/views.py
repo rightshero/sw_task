@@ -22,7 +22,6 @@ def create_category(request):
         if not all_categories.exists():
             category = Category.objects.create(name=name, parent=parent)
             return JsonResponse({'id': category.id, 'name': category.name})
-    print("gg")
-    return JsonResponse({
-        'error': 'Category with this name already exists'
-    }, status=400)
+
+    category = Category.objects.get(name=name, parent=parent)
+    return JsonResponse({'id': category.id, 'name': category.name})
