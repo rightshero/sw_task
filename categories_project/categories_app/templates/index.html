@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nested Categories</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+
+<body>
+    <h1>Nested Categories</h1>
+    <div id="categories">
+        {% for category in categories %}
+        <div class="category">
+            <input type="checkbox" id="category-{{ category.id }}" data-id="{{ category.id }}">
+            <label for="category-{{ category.id }}">{{ category.name }}</label>
+            <div class="subcategories" id="subcategories-{{ category.id }}"></div>
+        </div>
+        {% endfor %}
+    </div>
+    <script src="/static/js/categories.js"></script>
+</body>
+
+</html>
