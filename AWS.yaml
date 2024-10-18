@@ -1,0 +1,105 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: AWS CloudFormation Template to launch an EC2 instance with a specified IAM role and deploy a project.
+
+Resources:
+
+  # IAM Role
+  MyIAMRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      RoleName: MyEC2AdminRole
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: ec2.amazonaws.com
+            Action: sts:AssumeRole
+      Policies:
+        - PolicyName: AdminPolicy
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action: '*'
+                Resource: '*'
+
+  # EC2 Instance
+  MyEC2Instance:
+    Type: 'AWS::EC2::Instance'
+    Properties:
+      InstanceType: t3.micro
+      KeyName: !Ref KeyName
+      ImageId: ami-08eb150f611ca277f # ubntuo
+      IamInstanceProfile: !Ref MyIAMInstanceProfile
+      SecurityGroupIds: 
+        - !Ref MySecurityGroup
+      UserData: 
+        Fn::Base64: !Sub |
+          #!/bin/bash
+          sudo apt update
+          sudo apt install -y git
+          git clone -b categories https://github.com/MohanadGad38/sw_task.git
+          cd sw_task/
+          echo "DEBUG=True" > .env
+          echo "SECRET_KEY='django-insecure-%%f@&v16t-z6h9dy6nn$tx!^vfb+i-c1!*2m(+mnr*@ul3cuho'" >> .env
+          echo "DATABASE_URL='postgresql://MM:1G@production_db:5432/category_db'" >> .env
+          echo "NAME='category_db'" >> .env
+          echo "DB_USER='MM'" >> .env
+          echo "PASSWORD='1G'" >> .env
+          echo "HOST='production_db'" >> .env
+          echo "PORT='5432'" >> .env
+          echo "POSTGRES_USER='MM'" > database.env
+          echo "POSTGRES_PASSWORD='1G'" >> database.env
+          echo "POSTGRES_DB='category_db'" >> database.env
+          echo "PGADMIN_DEFAULT_EMAIL='righthero@gmail.com'" > database_management.env
+          echo "PGADMIN_DEFAULT_PASSWORD='1SG'" >> database_management.env
+          sudo apt install -y docker.io
+          sudo curl -L "https://github.com/docker/compose/releases/download/v2.11.2/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+          sudo chmod +x /usr/local/bin/docker-compose
+          sudo docker-compose up --build
+
+  # Security Group
+  MySecurityGroup:
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties:
+      GroupDescription: Enable SSH, HTTP, HTTPS, and TCP port 8000
+      VpcId: !Ref VPCId # Replace with your VPC ID
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: 0.0.0.0/0 # SSH
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0 # HTTP
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          CidrIp: 0.0.0.0/0 # HTTPS
+        - IpProtocol: tcp
+          FromPort: 8000
+          ToPort: 8000
+          CidrIp: 0.0.0.0/0 # TCP port 8000 this for development phase only 
+
+  # IAM Instance Profile
+  MyIAMInstanceProfile:
+    Type: 'AWS::IAM::InstanceProfile'
+    Properties:
+      Roles:
+        - !Ref MyIAMRole
+
+Parameters:
+  KeyName:
+    Description: Name of an existing EC2 KeyPair to enable SSH access
+    Type: 'AWS::EC2::KeyPair::KeyName'
+  
+  VPCId:
+    Description: VPC ID where the EC2 instance will be launched
+    Type: String
+
+Outputs:
+  InstanceId:
+    Description: The Instance ID
+    Value: !Ref MyEC2Instance
