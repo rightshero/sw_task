@@ -11,7 +11,9 @@ services:
     depends_on:
       - production_db
     networks:
-      - database_network 
+      database_network:
+        aliases:
+          - production_db
   production_db:
     image: postgres:16-alpine
     restart: unless-stopped
