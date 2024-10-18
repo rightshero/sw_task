@@ -25,7 +25,7 @@ SECRET_KEY = SETTINGS.secret_key
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = SETTINGS.debug
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']  # '*' means 'all hosts' note change it in production
 
 
 # Application definition
