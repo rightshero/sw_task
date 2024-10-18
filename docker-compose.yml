@@ -1,6 +1,17 @@
 version: '3.8'
 
 services:
+  web:
+    build: .
+    command: bash -c "python categories_project/manage.py migrate && python categories_project/manage.py runserver 0.0.0.0:8000"
+    volumes:
+      - .:/code
+    ports:
+      - 8000:8000
+    depends_on:
+      - production_db
+    networks:
+      - database_network 
   production_db:
     image: postgres:16-alpine
     restart: unless-stopped
