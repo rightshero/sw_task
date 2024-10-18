@@ -22,9 +22,7 @@ services:
     volumes:
       - database:/var/lib/postgresql/data
     networks:
-      database_network:
-        aliases:
-          - production_db 
+      - database_network 
 
   database_management:
     image: dpage/pgadmin4
