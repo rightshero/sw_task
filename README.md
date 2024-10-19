@@ -113,4 +113,4 @@ An AWS CloudFormation template YAML file is included. It:
 
 ---
 
-> **Note:•• check testing video
+# Note: check testing video
