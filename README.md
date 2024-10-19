@@ -1,65 +1,47 @@
-![alt text](https://rightshero.com/wp/wp-content/uploads/2024/04/RightsHero-Logo.png)
+# RightsHero Software Engineer Task Assessment
 
+This project is part of the RightsHero software engineer task assessment. It implements a recursive category selection page with dynamic checkboxes using Django for the backend and Vue.js for the frontend. Docker is used to manage the backend, database, and frontend environments.
 
-# Software Engineer Task Assessment
+## Project Overview
 
-This role will be part of the Rightshero software development team.
+The task includes two main components:
 
-As a software engineer you are a part of a small but very efficient and multi-tasking team. 
+1. **Recursive Category Selection**  
+   A page with dynamic checkboxes for categories and subcategories. Each parent category can have an unlimited number of child categories. Categories are managed using a Django backend with PostgreSQL, and the frontend is built using Vue.js.
 
-The team is tasked with handling all the software aspects of our service.
+2. **AWS CloudFormation** (Not deployed)  
+   A YAML file for launching an EC2 instance with IAM roles and deploying the project, which is not included due to the lack of a credit card for deployment.
 
-# The task
-The task will be a **project** and **AWS CloudFormation** template:
+## Technologies Used
 
-## [1] The project:
-A project contains one page have a 2 categories checkboxes
+- **Backend**: Django 4.2.16 with Django Rest Framework (DRF) and PostgreSQL.
+- **Frontend**: Vue.js 3 with Ajax for dynamic category selection.
+- **Docker**: Used to containerize the backend, frontend, and database.
+- **Database**: PostgreSQL.
 
-- [ ] Category A
-- [ ] Category B
+## Project Structure
 
-Unlimited subcategories of parent category (if it is hard to achieve the unlimited levels, you can set 3 levels hard-coded)
-Should use Ajax.
+├── rightshero/ │ ├── categories/ # Django app for category management │ ├── manage.py # Django project management script │ └── Dockerfile # Dockerfile for the Django backend ├── frontend/ │ ├── src/ # Vue.js components and frontend logic │ └── Dockerfile # Dockerfile for the Vue.js frontend ├── docker-compose.yml # Docker Compose configuration for backend, database, and frontend └── README.md # Project overview and setup instructions
 
-### Example
-- [ ] Category A
-- [ ] Category B
+## Prerequisites
 
-If user select “Category B”
-The system will create another 2 checkboxes with
+Before starting, make sure you have the following installed:
 
-- [ ] SUB Category B1
-- [ ] SUB Category B2
+- Docker
+- Docker Compose
+- Git
 
-Selecting Sub Category B2 will create another 2 checkboxes
+## Setup and Run Locally
 
-- [ ] SUB SUB Category B2-1
-- [ ] SUB SUB Category B2-2
- And so on
+docker-compose up --build
+This will:
 
+    Create and run Docker containers for the Django backend, Vue.js frontend, and PostgreSQL database.
+    Run database migrations automatically and create 5 initial categories.
 
-## [2] AWS CloudFormation
-An AWS CloudFormation template YAML file for:
-- Launch a t2.micro or t3.micro EC2 instance
-- Create IAM role with admin privileges
-- Attach the IAM role to the EC2 instance created earlier
-- Deploy the project on the EC2 instance
-- The instance should be accessable via SSH, HTTP and HTTPS protocols/ports
+## Access the Project
 
-
-# Notes
-- We would be scoring for the below aspects of the assignment:
-- DB,Architecture /Code (preferred MVC pattern), Security, Git
-- You could use a framework to create the project from scratch (Django).
-- You should use MySQL or Postgresql Databases.
-- Please use one table design in the database for all categories and subs.
-- The code should contain comments with important information.
-- README file for run the project locally.
-- The **AWS CloudFormation** template file.
-
-
-# Deliverables
-- The project should be ready with docker compose (web service + DB).
-- The **AWS CloudFormation** template YAML file.
-- Once you're finished, submit a PR to this repo with your email in a commit message.
-- The email should be the same as your email in the CV/Resume.
+    The backend will be available at: http://localhost:8000.
+    The frontend will be available at: http://localhost:8080.
+## Contact Information
+radwa.kaml00@eng-st.cu.edu.eg
