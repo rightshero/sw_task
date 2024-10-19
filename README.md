@@ -109,6 +109,8 @@ An AWS CloudFormation template YAML file is included. It:
 - Runs `docker-compose up`.
 - Opens a custom TCP port (8000) for the development phase.
 
-> **Note:** Running both the database and web services on the same instance is not recommended for production environments. also check testing video
+> **Note:** Running both the database and web services on the same instance is not recommended for production environments. 
 
 ---
+
+> **Note:•• check testing video
