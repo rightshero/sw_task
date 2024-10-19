@@ -1,5 +1,5 @@
 from django.core.management.base import BaseCommand
-from categories_app.models import Category
+from ...models import Category
 
 
 class Command(BaseCommand):
