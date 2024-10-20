@@ -3,7 +3,7 @@
 # 🧑🏽‍💻 Technologies Used
 1. **Poetry** – as the package manager and virtual environment
 2. **Django** – Python framework
-3. **Docker & Docker Compose** – for containerization and orchestration
+3. **Docker & Docker Compose** – for containerization 
 
 # ⚡️ Quick Start
 
