@@ -70,7 +70,11 @@ Create the `database.env` file with the same content as described earlier.
 Follow the steps above to create the `database_management.env` file.
 
 ## 4. Adjust Docker Compose
-Either remove the `web` service from the `docker-compose.yml` file or stop the web service.
+Either remove the `web` service from the `docker-compose.yml` file  or stop the web service and  run it 
+```bash
+docker-compose up
+```
+
 
 ## 5. Install Dependencies and Run Locally
 1. Navigate to the `SW_Task` folder.
