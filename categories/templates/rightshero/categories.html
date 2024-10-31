@@ -7,6 +7,11 @@
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 </head>
 <body>
+    <script type="text/javascript">
+        // Set CSRF token as a JavaScript variable:
+        var csrfToken = '{{ csrf_token }}';
+    </script>
+    
     <div id="categories">
         {% for category in categories %}
             <div>
@@ -30,6 +35,9 @@
                 $.ajax({
                     type: 'POST',
                     url: 'get-subcategories/',
+                    headers: {
+                    'X-CSRFToken': csrfToken  // Include CSRF token in the request headers
+                    },
                     data: {
                         'parent_id': categoryId,
                         'subcategory_names': predefinedSubcategories.join(',')

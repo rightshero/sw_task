@@ -1,6 +1,6 @@
 from .models import Category
 from django.shortcuts import render
-from django.http import JsonResponse
+from django.http import HttpResponseForbidden, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 
 def category_list(request):
@@ -8,7 +8,6 @@ def category_list(request):
     return render(request, 'rightshero/categories.html', {'categories': categories})
 
 
-@csrf_exempt
 def manage_subcategories(request):
     if request.method == 'POST':
         parent_id = request.POST.get('parent_id')
