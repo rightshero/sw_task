@@ -1,65 +1,121 @@
-![alt text](https://rightshero.com/wp/wp-content/uploads/2024/04/RightsHero-Logo.png)
+# Rightshero Project
+
+This project is a simple Django-based web application deployed using Docker and AWS. The application allows users to interact with hierarchical categories using AJAX. The infrastructure for the deployment is automated using AWS CloudFormation.
+
+## Features
+
+- Django backend for managing categories and subcategories dynamically.
+- AJAX integration for creating unlimited subcategories interactively on the frontend.
+- PostgreSQL database for storing categories and subcategories.
+- Docker for containerizing the application for easy setup.
+- CloudFormation template to automate the deployment on AWS EC2 instance.
+
+## Getting Started
+
+These instructions will help you get the project up and running on your local machine.
+
+### Prerequisites
+
+- Python 3.11
+- Django 4.2 (LTS)
+- Docker & Docker Compose
+- AWS CLI (optional, if deploying on AWS)
+
+### Installation
+
+1. **Clone the repository**:
+
+   ```bash
+   git clone https://github.com/usamaalzomor/sw_task
+   cd sw_task
+   ```
+
+2. **Set up Python environment**:
+
+   - Create a virtual environment:
+     ```bash
+     virtualenv --python=/path/to/python3.11 venv  # this creates virtualenv with python3.11 (recommended version of python)
+     source venv/bin/activate  
+     ```
+   - Install dependencies:
+     ```bash
+     pip install -r requirements.txt
+     ```
+
+3. **Set up environment variables**:
+
+   - The project includes a `.env` file that is already set up for use with Docker Compose. The environment variables inside it are suitable for running the project using Docker. If you need to run it locally without Docker, modify the `.env` file or create a new `.env.local` file with the appropriate values for your local environment.
+
+   - **Note**: If you are running the project locally without Docker, you should modify the `DATABASE_URL` variable to point to your local PostgreSQL instance, for example:
+     ```
+     DATABASE_URL=postgres://postgres:yourpassword@localhost:5432/yourdatabase
+     ```
+
+### Running with Docker
+
+1. **Build and run Docker containers**:
+
+   ```bash
+   docker-compose up --build
+   ```
+
+2. **Access the application**: The app will be accessible at [http://localhost:8000/categories/](http://localhost:8000/categories/).
 
 
-# Software Engineer Task Assessment
+### Running the Project Locally
 
-This role will be part of the Rightshero software development team.
+1. **Run migrations**:
 
-As a software engineer you are a part of a small but very efficient and multi-tasking team. 
+   ```bash
+   python manage.py migrate
+   ```
 
-The team is tasked with handling all the software aspects of our service.
+2. **Start the development server**:
 
-# The task
-The task will be a **project** and **AWS CloudFormation** template:
+   ```bash
+   python manage.py runserver
+   ```
 
-## [1] The project:
-A project contains one page have a 2 categories checkboxes
-
-- [ ] Category A
-- [ ] Category B
-
-Unlimited subcategories of parent category (if it is hard to achieve the unlimited levels, you can set 3 levels hard-coded)
-Should use Ajax.
-
-### Example
-- [ ] Category A
-- [ ] Category B
-
-If user select “Category B”
-The system will create another 2 checkboxes with
-
-- [ ] SUB Category B1
-- [ ] SUB Category B2
-
-Selecting Sub Category B2 will create another 2 checkboxes
-
-- [ ] SUB SUB Category B2-1
-- [ ] SUB SUB Category B2-2
- And so on
+3. **Access the application**: Open [http://127.0.0.1:8000/categories/](http://127.0.0.1:8000/categories/) in your browser.
 
 
-## [2] AWS CloudFormation
-An AWS CloudFormation template YAML file for:
-- Launch a t2.micro or t3.micro EC2 instance
-- Create IAM role with admin privileges
-- Attach the IAM role to the EC2 instance created earlier
-- Deploy the project on the EC2 instance
-- The instance should be accessable via SSH, HTTP and HTTPS protocols/ports
+### AWS Deployment
+
+The project includes a CloudFormation YAML template for automated deployment to AWS EC2.
+
+1. **Validate the CloudFormation Template**:
+
+   ```bash
+   cfn-lint cloudformation_template.yaml
+   ```
+
+2. **Deploy Using AWS CLI**:
+
+   ```bash
+   aws cloudformation create-stack --stack-name rightshero-stack --template-body file://cloudformation_template.yaml --capabilities CAPABILITY_NAMED_IAM
+   ```
+
+   > Note: Make sure to replace placeholder values for `KeyName` and `ImageId` in the `cloudformation_template.yaml`.
 
 
-# Notes
-- We would be scoring for the below aspects of the assignment:
-- DB,Architecture /Code (preferred MVC pattern), Security, Git
-- You could use a framework to create the project from scratch (Django).
-- You should use MySQL or Postgresql Databases.
-- Please use one table design in the database for all categories and subs.
-- The code should contain comments with important information.
-- README file for run the project locally.
-- The **AWS CloudFormation** template file.
+### Key Endpoints
+
+- `/categories/` - Endpoint to view all top-level categories.
+- `/load-subcategories/` - AJAX endpoint to dynamically load subcategories.
+- `/admin/` - Admin panel to manage categories and view the created subcategories.
+
+### Admin Panel Access
+
+You can access the Django admin panel to manage and view all categories, including subcategories, at [http://127.0.0.1:8000/admin/](http://127.0.0.1:8000/admin/). Use the username `admin` and password `admin` to log in. These credentials are automatically created during Docker setup using the variables in the `.env` file (`DJANGO_SUPERUSER_USERNAME`, `DJANGO_SUPERUSER_EMAIL`, `DJANGO_SUPERUSER_PASSWORD`).
+
+## Notes
+
+- The environment variables in the `.env` file are configured for Docker usage. If running the project locally without Docker, ensure to update the `.env` values accordingly, particularly the `DATABASE_URL`.
+- The `.env` file also includes settings for automatic superuser creation when using Docker. If you need to change the admin user details, modify the `DJANGO_SUPERUSER_USERNAME`, `DJANGO_SUPERUSER_EMAIL`, and `DJANGO_SUPERUSER_PASSWORD` variables.
+- Placeholder values in the CloudFormation template (like `KeyName` and `AMI ID`) need to be updated with actual values before deployment.
+- Make sure to replace the Django `SECRET_KEY` in production for security purposes.
 
 
-# Deliverables
-- The project should be ready with docker compose (web service + DB).
-- The **AWS CloudFormation** template YAML file.
-- Once you're finished, submit a PR to this repo with your email in a commit message.
-- The email should be the same as your email in the CV/Resume.
+## Authors
+
+- Usama Alzomor
