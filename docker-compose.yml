@@ -1,0 +1,24 @@
+version: "3.12"
+
+services:
+  web:
+    build: .
+    command: gunicorn sw_task.wsgi:application --bind 0.0.0.0:8000
+    volumes:
+      - .:/app
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+
+  db:
+    image: postgres:13
+    environment:
+      POSTGRES_DB: sw_task
+      POSTGRES_USER: sw_task
+      POSTGRES_PASSWORD: sw_task
+    volumes:
+    - postgres_data:/var/lib/postgresql/data
+
+volumes:
+  postgres_data:
