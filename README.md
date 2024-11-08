@@ -3,63 +3,68 @@
 
 # Software Engineer Task Assessment
 
-This role will be part of the Rightshero software development team.
+This application allows users to select categories and subcategories in a hierarchical structure. It uses Django for the backend API, Django REST Framework for building the API, and a simple HTML/JavaScript frontend for user interaction.
 
-As a software engineer you are a part of a small but very efficient and multi-tasking team. 
+## Features
 
-The team is tasked with handling all the software aspects of our service.
+*   Displays categories in a checkbox format.
+*   Dynamically loads subcategories when a category is selected.
+*   Automatically creates two new subcategories with predefined names when a category is selected.
+*   Handles unlimited levels of subcategories (or up to a limit defined in the API).
+*   Uses AJAX for seamless category loading and creation.
 
-# The task
-The task will be a **project** and **AWS CloudFormation** template:
+## Requirements
 
-## [1] The project:
-A project contains one page have a 2 categories checkboxes
+*   Python 3.12
+*   Poetry
+*   Docker
+*   Docker Compose
 
-- [ ] Category A
-- [ ] Category B
+## Installation
 
-Unlimited subcategories of parent category (if it is hard to achieve the unlimited levels, you can set 3 levels hard-coded)
-Should use Ajax.
+1.  Clone the repository:
+    ```bash
+    git clone [https://github.com/your-username/sw_task.git](https://github.com/your-username/sw_task.git)
+    ```
+2.  Navigate to the project directory:
+    ```bash
+    cd sw_task
+    ```
+3.  Install dependencies using Poetry:
+    ```bash
+    poetry install
+    ```
+4.  Create and apply database migrations:
+    ```bash
+    poetry run python manage.py makemigrations
+    poetry run python manage.py migrate
+    ```
+5.  Create a superuser for the admin interface (optional):
+    ```bash
+    poetry run python manage.py createsuperuser
+    ```
 
-### Example
-- [ ] Category A
-- [ ] Category B
+## Running the Application
 
-If user select “Category B”
-The system will create another 2 checkboxes with
+1.  Build and run the Docker containers:
+    ```bash
+    docker-compose up -d
+    ```
+2.  Access the application in your browser:
+    ```
+    http://0.0.0.0:8000/
+    ```
 
-- [ ] SUB Category B1
-- [ ] SUB Category B2
+## API Documentation
 
-Selecting Sub Category B2 will create another 2 checkboxes
+The API endpoints for managing categories are available at:
 
-- [ ] SUB SUB Category B2-1
-- [ ] SUB SUB Category B2-2
- And so on
+*   **List all categories:** `/categories/`
+*   **Create a new category:** `/categories/` (POST request)
+*   **Get a specific category:** `/categories/{id}/`
+*   **Update a category:** `/categories/{id}/` (PUT or PATCH request)
+*   **Delete a category:** `/categories/{id}/` (DELETE request)
 
+## Contributing
 
-## [2] AWS CloudFormation
-An AWS CloudFormation template YAML file for:
-- Launch a t2.micro or t3.micro EC2 instance
-- Create IAM role with admin privileges
-- Attach the IAM role to the EC2 instance created earlier
-- Deploy the project on the EC2 instance
-- The instance should be accessable via SSH, HTTP and HTTPS protocols/ports
-
-
-# Notes
-- We would be scoring for the below aspects of the assignment:
-- DB,Architecture /Code (preferred MVC pattern), Security, Git
-- You could use a framework to create the project from scratch (Django).
-- You should use MySQL or Postgresql Databases.
-- Please use one table design in the database for all categories and subs.
-- The code should contain comments with important information.
-- README file for run the project locally.
-- The **AWS CloudFormation** template file.
-
-
-# Deliverables
-- The project should be ready with docker compose (web service + DB).
-- The **AWS CloudFormation** template YAML file.
-- Once you're finished, submit a PR to this repo with your email in a commit message.
-- The email should be the same as your email in the CV/Resume.
+Contributions are welcome! Please feel free to submit issues or pull requests.
