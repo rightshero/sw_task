@@ -1,0 +1,24 @@
+# Python files
+__pycache__/
+*.py[cod]
+*.sqlite3
+
+# Environment and dependency files
+.env
+*.log
+*.pot
+*.pyc
+*.pyo
+venv/
+.idea/
+*.DS_Store
+
+# Django files
+db.sqlite3
+/staticfiles
+/media
+
+# Docker
+*.env
+*.log
+docker-compose.override.yml

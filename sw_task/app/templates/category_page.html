@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Category Selection</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <h2>Select Categories</h2>
+    <div id="category-container">
+        {% for category in categories %}
+            <div class="category">
+                <label>
+                    <input type="checkbox" class="category-checkbox" data-category-id="{{ category.id }}">
+                    {{ category.name }}
+                </label>
+                <div class="subcategories" id="subcategories-{{ category.id }}"></div>
+            </div>
+        {% endfor %}
+    </div>
+
+    <script>
+        $(document).ready(function(){
+            $('.category-checkbox').on('change', function() {
+                const categoryId = $(this).data('category-id');
+                const container = $('#subcategories-' + categoryId);
+
+                // Load subcategories when checkbox is selected
+                if (this.checked) {
+                    $.ajax({
+                        url: `{% url 'subcategories' category_id=categoryId %}`,
+                        type: 'GET',
+                        success: function(data) {
+                            data.subcategories.forEach(function(subcategory) {
+                                container.append(`
+                                    <label>
+                                        <input type="checkbox" class="subcategory-checkbox" data-category-id="${subcategory.id}">
+                                        ${subcategory.name}
+                                    </label>
+                                    <div class="subcategories" id="subcategories-${subcategory.id}"></div>
+                                `);
+                            });
+                        }
+                    });
+                } else {
+                    container.empty();  // Clear subcategories if unchecked
+                }
+            });
+        });
+    </script>
+</body>
+</html>

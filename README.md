@@ -1,65 +1,56 @@
-![alt text](https://rightshero.com/wp/wp-content/uploads/2024/04/RightsHero-Logo.png)
+# Django Category Management Project
+
+This project is a Django application that allows users to manage categories and subcategories dynamically. It includes a single page with checkboxes for categories and subcategories, with AJAX used to load subcategories based on user selections. The project is ready for deployment with Docker and AWS CloudFormation.
+
+## Features
+- Dynamic category and subcategory management with unlimited nesting (using AJAX).
+- AWS CloudFormation template to set up an EC2 instance with IAM role and deploy the project.
+- Docker setup with `docker-compose` for easy development and deployment.
+- PostgreSQL database.
+- Static file management using WhiteNoise for production.
+
+## Technologies Used
+- **Django**: Web framework.
+- **AJAX**: For dynamic loading of subcategories.
+- **PostgreSQL**: Database.
+- **Docker**: Containerization.
+- **AWS CloudFormation**: Infrastructure as code to launch and configure AWS resources.
+
+---
+
+## Project Structure
+
+```plaintext
+my_django_project/
+├── app/                       # Main Django app
+│   ├── migrations/            # Database migrations
+│   ├── static/                # Static files
+│   ├── templates/             # HTML templates
+│   ├── admin.py               # Admin customization
+│   ├── models.py              # Database models
+│   ├── views.py               # Application views
+│   └── urls.py                # Application URLs
+├── my_django_project/
+│   ├── settings.py            # Project settings
+│   ├── urls.py                # Project URLs
+│   ├── wsgi.py                # WSGI entry point for deployment
+├── docker-compose.yml         # Docker Compose configuration
+├── Dockerfile                 # Dockerfile for Django app
+├── requirements.txt           # Python dependencies
+├── cloudformation-template.yml # AWS CloudFormation template
+└── README.md                  # Project documentation
 
 
-# Software Engineer Task Assessment
-
-This role will be part of the Rightshero software development team.
-
-As a software engineer you are a part of a small but very efficient and multi-tasking team. 
-
-The team is tasked with handling all the software aspects of our service.
-
-# The task
-The task will be a **project** and **AWS CloudFormation** template:
-
-## [1] The project:
-A project contains one page have a 2 categories checkboxes
-
-- [ ] Category A
-- [ ] Category B
-
-Unlimited subcategories of parent category (if it is hard to achieve the unlimited levels, you can set 3 levels hard-coded)
-Should use Ajax.
-
-### Example
-- [ ] Category A
-- [ ] Category B
-
-If user select “Category B”
-The system will create another 2 checkboxes with
-
-- [ ] SUB Category B1
-- [ ] SUB Category B2
-
-Selecting Sub Category B2 will create another 2 checkboxes
-
-- [ ] SUB SUB Category B2-1
-- [ ] SUB SUB Category B2-2
- And so on
+Getting Started
+Prerequisites
+Docker & Docker Compose
+AWS account (for CloudFormation deployment)
+Python 3.8+
+pip (Python package manager)
 
 
-## [2] AWS CloudFormation
-An AWS CloudFormation template YAML file for:
-- Launch a t2.micro or t3.micro EC2 instance
-- Create IAM role with admin privileges
-- Attach the IAM role to the EC2 instance created earlier
-- Deploy the project on the EC2 instance
-- The instance should be accessable via SSH, HTTP and HTTPS protocols/ports
 
 
-# Notes
-- We would be scoring for the below aspects of the assignment:
-- DB,Architecture /Code (preferred MVC pattern), Security, Git
-- You could use a framework to create the project from scratch (Django).
-- You should use MySQL or Postgresql Databases.
-- Please use one table design in the database for all categories and subs.
-- The code should contain comments with important information.
-- README file for run the project locally.
-- The **AWS CloudFormation** template file.
-
-
-# Deliverables
-- The project should be ready with docker compose (web service + DB).
-- The **AWS CloudFormation** template YAML file.
-- Once you're finished, submit a PR to this repo with your email in a commit message.
-- The email should be the same as your email in the CV/Resume.
+Notes::::::
+I've attached my solution for the task, but this code reflects two days of work rather than a full week, as I had to return to my military service due to my leave has ended. I tried to write organized code, but I can’t claim this is a perfect or complete solution to the task. I'm ready for the technical interview.
+Note: My military service will end in just two weeks.
