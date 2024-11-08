@@ -1,21 +1,96 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<head>
-    <title>Category Selection</title>
+    <title>Categories</title>
     <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </head>
-
 <body>
-    <h1>Select a Category</h1>
-    
-    <!-- Main Category A and B checkboxes -->
-    <div>
-        <input type="checkbox" class="category-checkbox" data-category="A"> Category A
-        <input type="checkbox" class="category-checkbox" data-category="B"> Category B
+    <h2>Categories</h2>
+
+    <!-- Main Categories List -->
+    <div id="main-categories">
+        {% for category in categories %}
+            <label>
+                <input type="checkbox" class="category-checkbox" data-id="{{ category.id }}">
+                {{ category.name }}
+            </label><br>
+        {% endfor %}
     </div>
 
+    <!-- Subcategories Section -->
+    <div id="subcategories"></div>
 
+    <script>
+        // When a category checkbox is selected
+        $(document).on('change', '.category-checkbox', function() {
+            var categoryId = $(this).data('id');
+            var isChecked = $(this).is(':checked');
+
+            if (isChecked) {
+                // If selected, fetch and display subcategories
+                $.ajax({
+                    type: 'POST',
+                    url: '{% url "add_subcategory" %}',  // Correct URL for your add_subcategory view 
+                    data: {
+                        'parent_id': categoryId,
+                        'csrfmiddlewaretoken': '{{ csrf_token }}'
+
+                    },
+                    
+                    success: function(response) {
+                        if (response.status === 'success') {
+                            var subcategoriesHtml = '';
+                            response.subcategories.forEach(function(subcategory) {
+                                subcategoriesHtml += '<label><input type="checkbox" class="subcategory-checkbox" data-id="' + subcategory.id + '"> ' + subcategory.name + '</label><br>';
+                            });
+                            $('#subcategories').html(subcategoriesHtml);
+                        } else {
+                            alert(response.message || 'Error fetching subcategories');
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        alert('An error occurred: ' + error);
+                    }
+                });
+            } else {
+                // If unchecked, clear subcategories
+                $('#subcategories').empty();
+            }
+        });
+
+        // When a subcategory checkbox is selected
+        $(document).on('change', '.subcategory-checkbox', function() {
+            var subcategoryId = $(this).data('id');
+            var isChecked = $(this).is(':checked');
+            if (isChecked) {
+                // If selected, fetch and display sub-subcategories
+                $.ajax({
+                    type: 'POST',
+                    url: '{% url "add_sub_subcategory" %}',  // Correct URL for your add_sub_subcategory view
+                    data: {
+                        'parent_id': subcategoryId,
+                        'csrfmiddlewaretoken':'{{ csrf_token }}'
+                    },
+                    
+                    success: function(response) {
+                        if (response.status === 'success') {
+                            var subSubcategoriesHtml = '';
+                            response.sub_subcategories.forEach(function(sub_subcategory) {
+                                subSubcategoriesHtml += '<label>' + sub_subcategory.name + '</label><br>';
+                            });
+                            $('#subcategories').append(subSubcategoriesHtml);
+                        } else {
+                            alert(response.message || 'Error fetching sub-subcategories');
+                        }
+                    },
+                    error: function(xhr, status, error) {
+                        alert('An error occurred: ' + error);
+                    }
+                });
+            }
+        });
+    </script>
 </body>
 </html>
