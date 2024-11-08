@@ -54,6 +54,12 @@ This application allows users to select categories and subcategories in a hierar
     ```
     http://0.0.0.0:8000/
     ```
+3.  **Run migrations and create a superuser inside the `web` container:**
+    ```bash
+    docker-compose exec web poetry run python manage.py makemigrations
+    docker-compose exec web poetry run python manage.py migrate
+    docker-compose exec web poetry run python manage.py createsuperuser
+    ```
 
 ## API Documentation
 
