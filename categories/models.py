@@ -18,6 +18,8 @@ class Category(models.Model):
 
     # Method to generate and add exactly two subcategories at the same time
     def add_subcategory(self):
+        #delete existing subcategories (children)
+        self.children.all().delete()
         # Check if there are no subcategories already
         siblings_count = self.parent.children.count() if self.parent else 0
         subcategories = []  # Initialize an empty list for subcategories
@@ -31,6 +33,9 @@ class Category(models.Model):
 
     # New method to generate sub-subcategories (subcategories of subcategories)
     def add_sub_subcategory(self):
+        #delete existing sub-subcategories of each child (subcategory)
+        for subcategory in self.children.all():
+            subcategory.children.all().delete()
         # Check if there are subcategories to work with
         if not self.children.exists():
             return None  # No subcategories to generate sub-subcategories from

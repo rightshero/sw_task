@@ -21,7 +21,6 @@ def add_subcategory(request):
         try:
             parent_category = Category.objects.get(id=parent_id)
             # Clear existing subcategories
-            #parent_category.subcategories.all().delete()
             #generate new subs 
             subcategories = parent_category.add_subcategory()
 
