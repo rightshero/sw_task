@@ -8,7 +8,7 @@ def index(request):
     """
     Renders the index.html template.
     """
-    return render(request, 'categories/index.html')
+    return render(request, 'index.html')
 
 class CategoryViewSet(viewsets.ModelViewSet):
 
@@ -17,7 +17,7 @@ class CategoryViewSet(viewsets.ModelViewSet):
     """
     queryset = Category.objects.all()
     serializer_class = CategorySerializer
-    permission_classes = [permissions.IsAuthenticated]
+    # permission_classes = [permissions.IsAuthenticated]
 
     def perform_update(self, serializer):
         if serializer.validated_data.get('parent') == self.request.data.get('parent'):

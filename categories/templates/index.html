@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Category Selection</title>
+</head>
+<body>
+
+<h1>Select Categories</h1>
+
+<div id="categories"></div>
+
+<script>
+  function fetchCategories() { // No need for parentId in this function
+    fetch('/categories/')
+      .then(response => response.json())
+      .then(categories => {
+        const categoriesContainer = document.getElementById('categories');
+        categories.forEach(category => {
+          const categoryDiv = document.createElement('div');
+          categoryDiv.innerHTML = `
+            <input type="checkbox" id="category_${category.id}" data-category-id="${category.id}">
+            <label for="category_${category.id}">${category.name}</label>
+            <div id="subcategories_${category.id}"></div>
+          `;
+          categoriesContainer.appendChild(categoryDiv);
+
+          const checkbox = document.getElementById(`category_${category.id}`);
+          checkbox.addEventListener('change', function() {
+            if (this.checked) {
+              const categoryId = this.dataset.categoryId; // Get parent ID from checkbox
+              // Create 2 new subcategories with predefined names
+              for (let i = 1; i <= 2; i++) {
+                const newCategoryName = `SUB ${category.name} ${i}`;
+                fetch('/categories/', {
+                  method: 'POST',
+                  headers: {
+                    'Content-Type': 'application/json'
+                  },
+                  body: JSON.stringify({
+                    name: newCategoryName,
+                    parent: categoryId  // Use the correct parent ID
+                  })
+                })
+                .then(response => {
+                  if (!response.ok) {
+                    console.error('Error creating category:', response.status);
+                  }
+                })
+                .catch(error => console.error('Error creating category:', error));
+              }
+
+              // Refresh subcategories (you might want to optimize this)
+              fetchCategories();
+            } else {
+              // ... (logic for unchecking) ...
+            }
+          });
+        });
+      })
+      .catch(error => console.error('Error fetching categories:', error));
+  }
+
+  // Initial fetch for top-level categories
+  fetchCategories();
+</script>
+
+</body>
+</html>
