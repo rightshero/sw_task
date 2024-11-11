@@ -26,7 +26,7 @@ SECRET_KEY = 'django-insecure-%q2728^0l+(bnk@z-zo59p_=_p58+vnq7hiv=xu3th(fx=41wi
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -72,18 +72,17 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'cat_tree.wsgi.application'
 
-IS_DOCKER = os.environ.get('IS_DOCKER', False)
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'tree_db', 
-        'USER': 'tree_user', 
-        'PASSWORD': '1234',  
-        'HOST': 'db' if IS_DOCKER else 'localhost',
-        'PORT': '5432', 
+        'NAME': os.getenv('DB_NAME', 'tree_db'), 
+        'USER': os.getenv('DB_USER', 'tree_user'), 
+        'PASSWORD': os.getenv('DB_PASSWORD', '1234'), 
+        'HOST': os.getenv('DB_HOST', 'db'),  
+        'PORT': os.getenv('DB_PORT', '5432'), 
     }
 }
 

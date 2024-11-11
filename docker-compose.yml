@@ -1,0 +1,29 @@
+
+services:
+  db:
+    image: postgres:17
+    environment:
+      - POSTGRES_DB=tree_db
+      - POSTGRES_USER=tree_user
+      - POSTGRES_PASSWORD=1234
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"
+    
+  web:
+    build: .
+    environment:
+      - DB_NAME=tree_db
+      - DB_USER=tree_user
+      - DB_PASSWORD=1234
+      - DB_HOST=db  # Database service name
+      - DB_PORT=5432
+    depends_on:
+      - db
+    ports:
+      - "8001:8000"
+    command: ["sh", "-c", "python manage.py migrate && python manage.py runserver 0.0.0.0:8000"]
+
+volumes:
+  postgres_data:
