@@ -153,21 +153,6 @@ http://127.0.0.1:8000/admin
 
 Login with the superuser credentials you created earlier.
 
-## AWS CloudFormation Template
-
-The CloudFormation template `cloudformation-template.yaml` will:
-
-- Launch an EC2 instance (t2.micro or t3.micro)
-- Create an IAM role with admin privileges
-- Attach the IAM role to the EC2 instance
-- Allow SSH, HTTP, and HTTPS access to the instance
-
-### Running the Project on AWS
-
-1. Deploy the CloudFormation template in AWS via the AWS Management Console or CLI.
-2. After the EC2 instance is created, SSH into the instance and pull the latest code from your repository.
-3. Set up the environment, install dependencies, and start the Django project.
-
 ## Docker Setup
 
 The project includes a `docker-compose.yml` file to run the application and database in Docker containers.
@@ -184,11 +169,27 @@ The project includes a `docker-compose.yml` file to run the application and data
   docker-compose up
   ```
 
-3. If you want to Runserver via Docker 
+3. Run the server via docker
 
   ```bash
    docker-compose exec web python manage.py runserver 0.0.0.0:8001
   ```
+
+## AWS CloudFormation Template
+
+The CloudFormation template `cloudformation-template.yaml` will:
+
+- Launch an EC2 instance (t2.micro or t3.micro)
+- Create an IAM role with admin privileges
+- Attach the IAM role to the EC2 instance
+- Allow SSH, HTTP, and HTTPS access to the instance
+
+### Running the Project on AWS
+
+1. Deploy the CloudFormation template in AWS via the AWS Management Console or CLI.
+2. After the EC2 instance is created, SSH into the instance and pull the latest code from your repository.
+3. Set up the environment, install dependencies, and start the Django project.
+
 
 ## Security Considerations
 
