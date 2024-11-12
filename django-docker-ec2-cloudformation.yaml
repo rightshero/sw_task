@@ -27,6 +27,13 @@ Resources:
                 Action: "*"
                 Resource: "*"
 
+  # IAM Instance Profile for EC2 to attach the role
+  EC2InstanceProfile:
+    Type: AWS::IAM::InstanceProfile
+    Properties:
+      Roles:
+        - Ref: EC2InstanceRole
+
   # EC2 Instance Security Group to Allow SSH, HTTP, and HTTPS Traffic
   EC2InstanceSecurityGroup:
     Type: AWS::EC2::SecurityGroup
@@ -50,13 +57,13 @@ Resources:
   EC2Instance:
     Type: AWS::EC2::Instance
     Properties:
-      InstanceType: "t3.micro" 
+      InstanceType: "t3.micro"
       KeyName: !Ref KeyName
-      ImageId: "ami-03c2970bdb10a9e99" 
+      ImageId: "ami-03c2970bdb10a9e99"
       SecurityGroups:
         - !Ref EC2InstanceSecurityGroup
       IamInstanceProfile:
-        Ref: EC2InstanceRole
+        Ref: EC2InstanceProfile
       UserData:
         Fn::Base64: !Sub |
           #!/bin/bash
@@ -88,4 +95,3 @@ Outputs:
   PublicDNS:
     Description: "Public DNS of the EC2 instance"
     Value: !GetAtt EC2Instance.PublicDnsName
-
