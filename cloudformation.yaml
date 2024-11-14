@@ -156,7 +156,7 @@ Resources:
           sudo su
           cat <<EOF > .env
           DB_ENGINE=$(cat db_engine.txt)
-          DB_DATABASE=$(cat db_name.txt)
+          DB_NAME=$(cat db_name.txt)
           DB_USER=$(cat db_user.txt)
           DB_PASSWORD=$(cat db_password.txt)
           DB_HOST=$(cat db_host.txt)
@@ -167,7 +167,7 @@ Resources:
           rm db_engine.txt db_name.txt db_user.txt db_password.txt db_host.txt db_port.txt
 
           # Deploy with docker-compose
-          docker-compose up -d
+          docker compose up -d
 
 Outputs:
   InstanceId:
