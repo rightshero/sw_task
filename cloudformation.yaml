@@ -7,76 +7,67 @@ Parameters:
     Type: AWS::EC2::KeyPair::KeyName
     ConstraintDescription: Must be the name of an existing EC2 KeyPair
   
-  GIT_URL:
-    Description: URL of Git repository
-    Type: String
-    
   # Add parameters for environment variables
-  DB_ENGINE:
+  dbEngine:
     Type: String
-  DB_NAME:
+  dbName:
     Type: String
-  DB_USER:
-    Type: String
-    NoEcho: true
-  DB_PASSWORD:
+  dbUser:
     Type: String
     NoEcho: true
-  DB_HOST:
+  dbPassword:
     Type: String
-  DB_PORT:
+    NoEcho: true
+  dbHost:
+    Type: String
+  dbPort:
     Type: String
     NoEcho: true
   
 
 Resources:
-  # Parameter Store entries for environment variables & ssh-key
-  KeyName:
-    Type: AWS::SSM::Parameter
-    Properties:
-      Name: /db_engine
-      Value: !Ref DB_ENGINE
 
-  DBENGINEParameter:
+  DBEngineParameter:
     Type: AWS::SSM::Parameter
     Properties:
       Name: /db_engine
-      Value: !Ref DB_ENGINE
+      Type: String
+      Value: !Ref dbEngine
 
   DBNameParameter:
     Type: AWS::SSM::Parameter
     Properties:
       Name: /db_name
       Type: String
-      Value: !Ref DB_NAME
+      Value: !Ref dbName
 
   DBUserParameter:
     Type: AWS::SSM::Parameter
     Properties:
       Name: /db_user
       Type: String
-      Value: !Ref DB_USER
+      Value: !Ref dbUser
 
   DBPasswordParameter:
     Type: AWS::SSM::Parameter
     Properties:
       Name: /db_password
-      Type: SecureString
-      Value: !Ref DB_PASSWORD
+      Type: String
+      Value: !Ref dbPassword
 
   DBHostParameter:
     Type: AWS::SSM::Parameter
     Properties:
       Name: /db_host
       Type: String
-      Value: !Ref DB_HOST
+      Value: !Ref dbHost
 
   DBPortParameter:
     Type: AWS::SSM::Parameter
     Properties:
       Name: /db_port
       Type: String
-      Value: !Ref DB_PORT
+      Value: !Ref dbPort
       
 
 
@@ -93,15 +84,13 @@ Resources:
       ManagedPolicyArns:
         - arn:aws:iam::aws:policy/AdministratorAccess
       Policies:
-        - PolicyName: SSMAccess
+        - PolicyName: AdminPolicy
           PolicyDocument:
             Version: '2012-10-17'
             Statement:
               - Effect: Allow
-                Action:
-                  - ssm:GetParameter
-                  - ssm:GetParameters
-                Resource: !Sub 'arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/myapp/*'
+                Action: '*'
+                Resource: '*'
 
   InstanceProfile:
     Type: 'AWS::IAM::InstanceProfile'
@@ -152,18 +141,20 @@ Resources:
           systemctl enable amazon-ssm-agent
 
           # Clone repository
-          git clone ${GIT_URL} 
+          git clone https://github.com/ahmedo42/sw_task /app
+          cd /app
 
           # Create .env file from Parameter Store
-          aws ssm get-parameter --name /db_engine --region ${AWS::Region} --query Parameter.Value --output text > db_engine.txt
-          aws ssm get-parameter --name /db_name --region ${AWS::Region} --query Parameter.Value --output text > db_name.txt
-          aws ssm get-parameter --name /db_user --region ${AWS::Region} --query Parameter.Value --output text > db_user.txt
-          aws ssm get-parameter --name /db_password --with-decryption --region ${AWS::Region} --query Parameter.Value --output text > db_password.txt
-          aws ssm get-parameter --name /db_host --region ${AWS::Region} --query Parameter.Value --output text > db_host.txt
-          aws ssm get-parameter --name /db_port --region ${AWS::Region} --query Parameter.Value --output text > db_port.txt
+          aws ssm get-parameter --name /db_engine --query Parameter.Value --output text > db_engine.txt
+          aws ssm get-parameter --name /db_name --query Parameter.Value --output text > db_name.txt
+          aws ssm get-parameter --name /db_user --query Parameter.Value --output text > db_user.txt
+          aws ssm get-parameter --name /db_password  --query Parameter.Value --output text > db_password.txt
+          aws ssm get-parameter --name /db_host --query Parameter.Value --output text > db_host.txt
+          aws ssm get-parameter --name /db_port --query Parameter.Value --output text > db_port.txt
 
           # Create .env file
-          cat << EOF > .env
+          sudo su
+          cat <<EOF > .env
           DB_ENGINE=$(cat db_engine.txt)
           DB_DATABASE=$(cat db_name.txt)
           DB_USER=$(cat db_user.txt)

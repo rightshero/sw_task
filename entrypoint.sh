@@ -9,7 +9,6 @@ then
     echo "PostgreSQL started"
 fi
 
-python manage.py flush --no-input
 python manage.py makemigrations categories
 python manage.py migrate
 python manage.py loaddata initial_data.json
