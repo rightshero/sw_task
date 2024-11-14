@@ -1,0 +1,19 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Categories</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link rel="stylesheet" href="{% static 'css/categories.css' %}">
+</head>
+<body>
+    <div id="categories-container">
+        {% include "render_category.html" with categories=category_tree %}
+    </div>
+
+    <script>
+        const createSubcategoriesUrl = '{% url "create_subcategories" %}';
+    </script>
+    <script src="{% static 'js/categories.js' %}"></script>
+</body>
+</html>

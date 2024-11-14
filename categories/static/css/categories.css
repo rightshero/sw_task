@@ -1,0 +1,12 @@
+.subcategories {
+    margin-left: 20px;
+    display: none;
+}
+.category-item {
+    margin: 5px 0;
+}
+.loading {
+    color: #666;
+    font-style: italic;
+    margin-left: 10px;
+}

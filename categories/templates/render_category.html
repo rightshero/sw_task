@@ -1,0 +1,15 @@
+{% for category in categories %}
+    <div class="category-item">
+        <input type="checkbox" 
+               id="cat_{{ category.id }}" 
+               class="category-checkbox" 
+               data-id="{{ category.id }}" 
+               data-level="{{ category.level }}">
+        <label for="cat_{{ category.id }}">{{ category.name }}</label>
+        <div id="subcategories_{{ category.id }}" class="subcategories">
+            {% if category.children %}
+                {% include "render_category.html" with categories=category.children %}
+            {% endif %}
+        </div>
+    </div>
+{% endfor %}

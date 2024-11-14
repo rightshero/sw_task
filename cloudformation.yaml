@@ -1,0 +1,190 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'EC2 instance with IAM role and security group'
+
+Parameters:
+  KeyName:
+    Description: Name of an existing EC2 KeyPair to enable SSH access
+    Type: AWS::EC2::KeyPair::KeyName
+    ConstraintDescription: Must be the name of an existing EC2 KeyPair
+  
+  GIT_URL:
+    Description: URL of Git repository
+    Type: String
+    
+  # Add parameters for environment variables
+  DB_ENGINE:
+    Type: String
+  DB_NAME:
+    Type: String
+  DB_USER:
+    Type: String
+    NoEcho: true
+  DB_PASSWORD:
+    Type: String
+    NoEcho: true
+  DB_HOST:
+    Type: String
+  DB_PORT:
+    Type: String
+    NoEcho: true
+  
+
+Resources:
+  # Parameter Store entries for environment variables & ssh-key
+  KeyName:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: /db_engine
+      Value: !Ref DB_ENGINE
+
+  DBENGINEParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: /db_engine
+      Value: !Ref DB_ENGINE
+
+  DBNameParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: /db_name
+      Type: String
+      Value: !Ref DB_NAME
+
+  DBUserParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: /db_user
+      Type: String
+      Value: !Ref DB_USER
+
+  DBPasswordParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: /db_password
+      Type: SecureString
+      Value: !Ref DB_PASSWORD
+
+  DBHostParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: /db_host
+      Type: String
+      Value: !Ref DB_HOST
+
+  DBPortParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: /db_port
+      Type: String
+      Value: !Ref DB_PORT
+      
+
+
+  AdminRole:
+    Type: 'AWS::IAM::Role'
+    Properties:
+      AssumeRolePolicyDocument:
+        Version: '2012-10-17'
+        Statement:
+          - Effect: Allow
+            Principal:
+              Service: ec2.amazonaws.com
+            Action: 'sts:AssumeRole'
+      ManagedPolicyArns:
+        - arn:aws:iam::aws:policy/AdministratorAccess
+      Policies:
+        - PolicyName: SSMAccess
+          PolicyDocument:
+            Version: '2012-10-17'
+            Statement:
+              - Effect: Allow
+                Action:
+                  - ssm:GetParameter
+                  - ssm:GetParameters
+                Resource: !Sub 'arn:aws:ssm:${AWS::Region}:${AWS::AccountId}:parameter/myapp/*'
+
+  InstanceProfile:
+    Type: 'AWS::IAM::InstanceProfile'
+    Properties:
+      Roles:
+        - !Ref AdminRole
+
+  SecurityGroup:
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties:
+      GroupDescription: Allow SSH, HTTP, and HTTPS access
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: 22
+          ToPort: 22
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 80
+          ToPort: 80
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: 443
+          ToPort: 443
+          CidrIp: 0.0.0.0/0
+
+  EC2Instance:
+    Type: 'AWS::EC2::Instance'
+    Properties:
+      InstanceType: t3.micro
+      SecurityGroups:
+        - !Ref SecurityGroup
+      KeyName: !Ref KeyName
+      ImageId: ami-0440d3b780d96b29d  # Amazon Linux 2 AMI ID for us-east-1
+      IamInstanceProfile: !Ref InstanceProfile
+      UserData:
+        Fn::Base64: |
+          #!/bin/bash
+          yum update -y
+          yum install -y docker git aws-cli jq
+          systemctl start docker
+          systemctl enable docker
+          curl -L "https://github.com/docker/compose/releases/latest/download/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+          chmod +x /usr/local/bin/docker-compose
+
+          # Install AWS SSM agent
+          yum install -y amazon-ssm-agent
+          systemctl start amazon-ssm-agent
+          systemctl enable amazon-ssm-agent
+
+          # Clone repository
+          git clone ${GIT_URL} 
+
+          # Create .env file from Parameter Store
+          aws ssm get-parameter --name /db_engine --region ${AWS::Region} --query Parameter.Value --output text > db_engine.txt
+          aws ssm get-parameter --name /db_name --region ${AWS::Region} --query Parameter.Value --output text > db_name.txt
+          aws ssm get-parameter --name /db_user --region ${AWS::Region} --query Parameter.Value --output text > db_user.txt
+          aws ssm get-parameter --name /db_password --with-decryption --region ${AWS::Region} --query Parameter.Value --output text > db_password.txt
+          aws ssm get-parameter --name /db_host --region ${AWS::Region} --query Parameter.Value --output text > db_host.txt
+          aws ssm get-parameter --name /db_port --region ${AWS::Region} --query Parameter.Value --output text > db_port.txt
+
+          # Create .env file
+          cat << EOF > .env
+          DB_ENGINE=$(cat db_engine.txt)
+          DB_DATABASE=$(cat db_name.txt)
+          DB_USER=$(cat db_user.txt)
+          DB_PASSWORD=$(cat db_password.txt)
+          DB_HOST=$(cat db_host.txt)
+          DB_PORT=$(cat db_port.txt)
+          EOF
+
+          # Clean up temporary files
+          rm db_engine.txt db_name.txt db_user.txt db_password.txt db_host.txt db_port.txt
+
+          # Deploy with docker-compose
+          docker-compose up -d
+
+Outputs:
+  InstanceId:
+    Description: Instance ID of the EC2 instance
+    Value: !Ref EC2Instance
+  PublicDNS:
+    Description: Public DNS name of the EC2 instance
+    Value: !GetAtt EC2Instance.PublicDnsName
+  PublicIP:
+    Description: Public IP address of the EC2 instance
+    Value: !GetAtt EC2Instance.PublicIp
