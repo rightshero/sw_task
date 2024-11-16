@@ -1,25 +1,10 @@
-![alt text](https://rightshero.com/wp/wp-content/uploads/2024/04/RightsHero-Logo.png)
-
-
-# Software Engineer Task Assessment
-
-This role will be part of the Rightshero software development team.
-
-As a software engineer you are a part of a small but very efficient and multi-tasking team. 
-
-The team is tasked with handling all the software aspects of our service.
-
-# The task
-The task will be a **project** and **AWS CloudFormation** template:
-
-## [1] The project:
+## 1. The project
 A project contains one page have a 2 categories checkboxes
 
 - [ ] Category A
 - [ ] Category B
 
-Unlimited subcategories of parent category (if it is hard to achieve the unlimited levels, you can set 3 levels hard-coded)
-Should use Ajax.
+Unlimited subcategories of parent category
 
 ### Example
 - [ ] Category A
@@ -37,29 +22,90 @@ Selecting Sub Category B2 will create another 2 checkboxes
 - [ ] SUB SUB Category B2-2
  And so on
 
+The project uses [Django](https://www.djangoproject.com/) for the backend, [nginx](https://nginx.org/en/) as a reverse-proxy and [gunicorn](https://gunicorn.org/) as an http server.
 
-## [2] AWS CloudFormation
-An AWS CloudFormation template YAML file for:
-- Launch a t2.micro or t3.micro EC2 instance
-- Create IAM role with admin privileges
-- Attach the IAM role to the EC2 instance created earlier
-- Deploy the project on the EC2 instance
-- The instance should be accessable via SSH, HTTP and HTTPS protocols/ports
+## 2. Running The Project Locally
+
+1. create a local .env file containing the following variables:
+
+```bash
+DB_ENGINE=django.db.backends.postgresql
+DB_NAME=db-name
+DB_USER=db-username
+DB_PASSWORD=db-password
+DB_HOST=db-host
+DB_PORT=db-port
+DJANGO_SECRET=django-secret-key
+```
+2. Install Docker and docker-compose
+
+Docker installed: https://docs.docker.com/get-docker/
+Docker Compose installed: https://docs.docker.com/compose/install/   
+
+3. Build and run the web-service locally
+
+```bash
+docker-compose up
+```
+
+## 3. Deployment on AWS
+
+1. Install the aws-cli
+
+```
+pip install aws-cli
+```
 
 
-# Notes
-- We would be scoring for the below aspects of the assignment:
-- DB,Architecture /Code (preferred MVC pattern), Security, Git
-- You could use a framework to create the project from scratch (Django).
-- You should use MySQL or Postgresql Databases.
-- Please use one table design in the database for all categories and subs.
-- The code should contain comments with important information.
-- README file for run the project locally.
-- The **AWS CloudFormation** template file.
+2. Create a `parameters.json` file in the project root directory with the following structure:
+
+```json
+[
+    {
+      "ParameterKey": "KeyName", 
+      "ParameterValue": "your_ssh_key_name"
+    },
+    {
+      "ParameterKey": "dbEngine",
+      "ParameterValue": "django.db.backends.postgresql"
+    },
+    {
+      "ParameterKey": "dbName",
+      "ParameterValue": "your_database_name"
+    },
+    {
+      "ParameterKey": "dbUser",
+      "ParameterValue": "your_database_username"
+    },
+    {
+        "ParameterKey": "dbPassword",
+        "ParameterValue": "your_database_password"
+    },
+    {
+        "ParameterKey": "dbHost",
+        "ParameterValue": "your_database_host"
+    },
+    {
+        "ParameterKey": "dbPort",
+        "ParameterValue": "your_database_port"
+    },
+    {
+      "ParameterKey": "djangoSecret",
+      "ParameterValue": "your_django_secret_key"
+    }
+]
+
+```
 
 
-# Deliverables
-- The project should be ready with docker compose (web service + DB).
-- The **AWS CloudFormation** template YAML file.
-- Once you're finished, submit a PR to this repo with your email in a commit message.
-- The email should be the same as your email in the CV/Resume.
+3. Deploy the project as a cloudformation stack
+
+```bash
+
+aws cloudformation create-stack \
+  --stack-name rightshero-stack \
+  --template-body file://cloudformation.yaml \
+  --parameters file://parameters.json \
+  --capabilities CAPABILITY_NAMED_IAM
+
+```
