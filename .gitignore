@@ -133,3 +133,4 @@ GitHub.sublime-settings
 # secrets
 *.pem
 parameters.json
+/static

@@ -1,11 +1,12 @@
 services:
   web-service:
     build: .
-    command: ["python", "manage.py", "runserver", "0.0.0.0:8000"]
     volumes:
       - .:/app
+      - static_volume:/app/static
     ports:
-      - "8000:8000"
+      - "80:80"
+      - "443:443"
     env_file:
       - .env
     depends_on:
@@ -24,3 +25,4 @@ services:
 
 volumes:
   postgres_data:
+  static_volume:

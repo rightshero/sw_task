@@ -1,3 +1,4 @@
+#!/bin/bash
 if [ "$DATABASE" = "postgres" ]
 then
     echo "Waiting for postgres..."
@@ -9,9 +10,11 @@ then
     echo "PostgreSQL started"
 fi
 
+python manage.py collectstatic --noinput
+python manage.py flush --noinput
 python manage.py makemigrations categories
 python manage.py migrate
 python manage.py loaddata initial_data.json
 
-
-exec "$@"
+nginx 
+gunicorn limitless.wsgi --workers 3  --bind 0.0.0.0:8000
