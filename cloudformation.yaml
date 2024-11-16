@@ -23,7 +23,9 @@ Parameters:
   dbPort:
     Type: String
     NoEcho: true
-  
+  djangoSecret:
+    Type: String
+    NoEcho: true
 
 Resources:
 
@@ -68,7 +70,13 @@ Resources:
       Name: /db_port
       Type: String
       Value: !Ref dbPort
-      
+
+  DjangoSecretParameter:
+    Type: AWS::SSM::Parameter
+    Properties:
+      Name: /django_secret
+      Type: String
+      Value: !Ref dbPort
 
 
   AdminRole:
@@ -151,6 +159,7 @@ Resources:
           aws ssm get-parameter --name /db_password  --query Parameter.Value --output text > db_password.txt
           aws ssm get-parameter --name /db_host --query Parameter.Value --output text > db_host.txt
           aws ssm get-parameter --name /db_port --query Parameter.Value --output text > db_port.txt
+          aws ssm get-parameter --name /django_secret --query Parameter.Value --output text > django_secret.txt
 
           # Create .env file
           sudo su
@@ -161,13 +170,14 @@ Resources:
           DB_PASSWORD=$(cat db_password.txt)
           DB_HOST=$(cat db_host.txt)
           DB_PORT=$(cat db_port.txt)
+          DJANGO_SECRET=$(cat django_secret.txt)
           EOF
 
           # Clean up temporary files
-          rm db_engine.txt db_name.txt db_user.txt db_password.txt db_host.txt db_port.txt
+          rm -rf db_engine.txt db_name.txt db_user.txt db_password.txt db_host.txt db_port.txt django_secret.txt
 
           # Deploy with docker-compose
-          docker compose up -d
+          docker-compose up -d
 
 Outputs:
   InstanceId:

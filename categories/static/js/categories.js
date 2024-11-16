@@ -1,8 +1,6 @@
 $(document).ready(function() {
-    let loadingRequests = new Set();
-
     // Load saved state from localStorage
-    function loadSavedState() {
+    function loadState() {
         const savedState = localStorage.getItem('categoryState');
         if (savedState) {
             const checkedBoxes = JSON.parse(savedState);
@@ -25,11 +23,7 @@ $(document).ready(function() {
         localStorage.setItem('categoryState', JSON.stringify(checkedBoxes));
     }
 
-    function createNewSubcategories(categoryId) {
-        if (loadingRequests.has(categoryId)) return;
-        
-        loadingRequests.add(categoryId);
-
+    function createSubcategories(categoryId) {
         $.ajax({
             url: createSubcategoriesUrl,
             data: { 'category_id': categoryId },
@@ -37,7 +31,7 @@ $(document).ready(function() {
             success: function(data) {
                 const container = $(`#subcategories_${categoryId}`);
                 if (!container.children('.category-item').length) {
-                    renderNewSubcategories(container, data.subcategories);
+                    renderSubcategories(container, data.subcategories);
                 }
                 container.show();
                 saveState();
@@ -47,13 +41,10 @@ $(document).ready(function() {
                 container.empty();
                 container.append('<div class="error">Error creating subcategories</div>');
             },
-            complete: function() {
-                loadingRequests.delete(categoryId);
-            }
         });
     }
 
-    function renderNewSubcategories(container, subcategories) {
+    function renderSubcategories(container, subcategories) {
         subcategories.forEach(function(subcategory) {
             const subcategoryHtml = `
                 <div class="category-item">
@@ -76,7 +67,7 @@ $(document).ready(function() {
         
         if (this.checked) {
             if (!container.children('.category-item').length) {
-                createNewSubcategories(categoryId);
+                createSubcategories(categoryId);
             } else {
                 container.show();
                 saveState();
@@ -88,7 +79,7 @@ $(document).ready(function() {
     });
 
     // Load saved state on page load
-    loadSavedState();
+    loadState();
 
     // Save state when leaving page
     $(window).on('beforeunload', function() {

@@ -16,14 +16,14 @@ RUN apt-get update && apt-get install -y \
 
 
 
-#Copy Nginx configuration
+# Copy Nginx configuration
 COPY nginx.conf /etc/nginx/sites-available/default
 RUN ln -sf /etc/nginx/sites-available/default /etc/nginx/sites-enabled/default
 
 # Create directory for SSL certificates
 RUN mkdir -p /etc/nginx/ssl
 
-# Generate self-signed SSL certificate (for development/testing)
+# Generate self-signed SSL certificate for development
 RUN openssl req -x509 -nodes -days 365 -newkey rsa:2048 \
     -keyout /etc/nginx/ssl/nginx.key \
     -out /etc/nginx/ssl/nginx.crt \
@@ -40,6 +40,8 @@ RUN chmod +x ./entrypoint.sh
 
 # Copy the content of the local src directory to the working directory
 COPY . .
+
+# Expose ports for http/https
 EXPOSE 80 443
 
 ENTRYPOINT ["sh", "./entrypoint.sh"]
